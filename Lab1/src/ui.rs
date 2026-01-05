@@ -1,4 +1,8 @@
+use crate::PROJECT_TITLE;
+use crate::config::Config;
 use crate::errors::ProjectError;
+use crate::ui::app::App;
+use thiserror::Error;
 
 pub struct Ui {
     min_width: f32,
@@ -15,6 +19,31 @@ impl Default for Ui {
 }
 
 impl Ui {
+    pub fn start(self, config: Config) -> Result<(), ProjectError> {
+        let native_options = eframe::NativeOptions {
+            viewport: egui::ViewportBuilder::default()
+                .with_app_id(PROJECT_TITLE) // Wayland requirement
+                .with_title(PROJECT_TITLE)
+                .with_inner_size([self.min_width, self.min_height])
+                .with_min_inner_size([self.min_width, self.min_height])
+                .with_icon(
+                    eframe::icon_data::from_png_bytes(
+                        &include_bytes!("../assets/icon.png")[..],
+                    ).map_err(|_| GraphicsBackendError::AppIcon)?
+                ),
+            centered: true,
+            ..Default::default()
+        };
+
+        eframe::run_native(
+            PROJECT_TITLE,
+            native_options,
+            Box::new(|cc| Ok(Box::new(App::new(cc, config)))),
+        )
+        .map_err(GraphicsBackendError::FailedRunNative)
+        .map_err(ProjectError::GraphicsBackend)
+    }
+
     pub fn native_panic_message(error: ProjectError) {
         rfd::MessageDialog::new()
             .set_title("Critical Error")
@@ -24,4 +53,15 @@ impl Ui {
     }
 }
 
+#[derive(Debug, Error)]
+pub enum GraphicsBackendError {
+    #[error("Failed to load app icon.")]
+    AppIcon,
+
+    #[error("Failed to run native app. {0}")]
+    FailedRunNative(#[from] eframe::Error),
+}
+
+pub mod app;
+pub mod modals;
 pub mod themes;

@@ -19,10 +19,17 @@ fn main() {
             Ui::native_panic_message(error);
             std::process::exit(1);
         });
+
+    Ui::default().start(config).unwrap_or_else(|error| {
+        Ui::native_panic_message(error);
+        std::process::exit(1);
+    });
 }
 
 pub mod config;
+pub mod context;
 pub mod errors;
 pub mod io;
 pub mod logs;
 pub mod ui;
+pub mod utils;
