@@ -1,6 +1,6 @@
 use crate::math::angle::Angle;
-use crate::settings::dot::DotSettings;
-use crate::settings::shape::ShapeSettings;
+use crate::metadata::dot::DotMetadata;
+use crate::metadata::shape::ShapeMetadata;
 use crate::space::Space;
 use egui::epaint::CircleShape;
 use egui::{Pos2, Shape};
@@ -19,6 +19,14 @@ impl Point2D {
         Point2D {
             x,
             y,
+            space: Space::Local,
+        }
+    }
+
+    pub fn zero() -> Self {
+        Point2D {
+            x: 0.0,
+            y: 0.0,
             space: Space::Local,
         }
     }
@@ -66,13 +74,13 @@ impl Point2D {
         }
     }
 
-    pub fn to_shape(self, settings: &ShapeSettings) -> Shape {
-        Shape::circle_filled(self.into(), settings.radius, settings.color)
+    pub fn to_shape(self, metadata: &ShapeMetadata) -> Shape {
+        Shape::circle_filled(self.into(), metadata.radius, metadata.color)
     }
 
-    pub fn to_dot(self, settings: &DotSettings) -> Shape {
-        let mut shape = CircleShape::filled(self.into(), settings.radius, settings.fill);
-        shape.stroke = settings.stroke;
+    pub fn to_dot(self, metadata: &DotMetadata) -> Shape {
+        let mut shape = CircleShape::filled(self.into(), metadata.radius, metadata.fill);
+        shape.stroke = metadata.stroke;
 
         Shape::Circle(shape)
     }
