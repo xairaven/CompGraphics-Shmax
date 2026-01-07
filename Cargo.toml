@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
 
-members = ["Lab1"]
+members = ["common", "Lab1"]
 
 [profile.release]
 lto = true

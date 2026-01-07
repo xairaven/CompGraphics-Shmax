@@ -1,7 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Run Lab1" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
-    <option name="buildProfileId" value="dev" />
-    <option name="command" value="run --bin Lab1" />
+  <configuration default="false" name="Build Common" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+    <option name="command" value="build --package common" />
     <option name="workingDirectory" value="file://$PROJECT_DIR$" />
     <envs />
     <option name="emulateTerminal" value="true" />

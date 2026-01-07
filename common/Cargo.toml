@@ -1,0 +1,12 @@
+[package]
+name = "common"
+version = "0.1.0"
+authors = ["Maksym Murenets"]
+
+edition = "2024"
+rust-version = "1.92"
+
+categories = ["graphics"]
+
+[lints]
+workspace = true
