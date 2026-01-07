@@ -1,5 +1,5 @@
 [package]
-name = "common"
+name = "geometry"
 version = "0.1.0"
 authors = ["Maksym Murenets"]
 

@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Build Common" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
-    <option name="command" value="build --package common" />
+  <configuration default="false" name="Build Geometry" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+    <option name="command" value="build --package geometry" />
     <option name="workingDirectory" value="file://$PROJECT_DIR$" />
     <envs />
     <option name="emulateTerminal" value="true" />
