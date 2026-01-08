@@ -1,3 +1,5 @@
+use crate::convertible::Convertible;
+use crate::primitives::line2d::Line2D;
 use crate::primitives::point2d::Point2D;
 use std::ops::RangeInclusive;
 
@@ -9,6 +11,7 @@ pub enum Space {
 
 pub const PX_PER_CM_RANGE: RangeInclusive<i64> = 10..=100;
 
+#[derive(Debug)]
 pub struct SpaceContext {
     pub settings: SpaceSettings,
     pub state: SpaceState,
@@ -61,4 +64,14 @@ impl SpaceState {
 pub struct SpaceSize {
     pub width: f64,
     pub height: f64,
+}
+
+pub trait Shapeable {
+    fn screen_shape(&self, space_context: &SpaceContext) -> egui::Shape;
+}
+
+impl Shapeable for Line2D {
+    fn screen_shape(&self, space_context: &SpaceContext) -> egui::Shape {
+        self.centimeters_to_pixels(space_context).to_shape()
+    }
 }

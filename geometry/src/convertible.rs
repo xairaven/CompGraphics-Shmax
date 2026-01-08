@@ -1,3 +1,4 @@
+use crate::primitives::line2d::Line2D;
 use crate::primitives::point2d::Point2D;
 use crate::space::{Space, SpaceContext};
 use egui::Vec2;
@@ -48,6 +49,24 @@ impl Convertible for Point2D {
             + context.state.offset.1;
 
         Point2D::new(x, y).with_space_local()
+    }
+}
+
+impl Convertible for Line2D {
+    fn centimeters_to_pixels(self, context: &SpaceContext) -> Self {
+        Self {
+            start: self.start.centimeters_to_pixels(context),
+            end: self.end.centimeters_to_pixels(context),
+            stroke: self.stroke,
+        }
+    }
+
+    fn pixels_to_centimeters(self, context: &SpaceContext) -> Self {
+        Self {
+            start: self.start.pixels_to_centimeters(context),
+            end: self.end.pixels_to_centimeters(context),
+            stroke: self.stroke,
+        }
     }
 }
 
