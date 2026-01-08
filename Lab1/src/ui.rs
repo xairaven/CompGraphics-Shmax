@@ -65,3 +65,8 @@ pub enum GraphicsBackendError {
 pub mod app;
 pub mod modals;
 pub mod themes;
+pub mod workspace;
+pub mod components {
+    pub mod canvas;
+    pub mod settings;
+}
