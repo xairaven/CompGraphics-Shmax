@@ -1,6 +1,8 @@
 pub mod convertible;
 pub mod space;
-pub mod figures {}
+pub mod figures {
+    pub mod grid;
+}
 pub mod math {
     pub mod angle;
 }

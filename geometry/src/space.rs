@@ -14,17 +14,29 @@ pub struct SpaceContext {
     pub state: SpaceState,
 }
 
+// Stored in pixels, unit length in centimeters
 #[derive(Debug)]
 pub struct SpaceSettings {
     pub zero_point: Point2D,
+    pub size: SpaceSize,
     pub unit_length: f64,
     pub is_drag_enabled: bool,
 }
 
+// Stored in pixels
 #[derive(Debug)]
 pub struct SpaceState {
     pub pixels_per_centimeter: f64,
     pub offset: (f64, f64),
+}
+
+impl Default for SpaceState {
+    fn default() -> Self {
+        Self {
+            pixels_per_centimeter: 20.0,
+            offset: (0.0, 0.0),
+        }
+    }
 }
 
 impl SpaceState {
@@ -43,4 +55,10 @@ impl SpaceState {
             ui.ctx().request_repaint();
         }
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct SpaceSize {
+    pub width: f64,
+    pub height: f64,
 }
