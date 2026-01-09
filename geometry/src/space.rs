@@ -1,6 +1,7 @@
 use crate::convertible::Convertible;
 use crate::primitives::line2d::Line2D;
 use crate::primitives::point2d::Point2D;
+use egui::{InputState, Response};
 use std::ops::RangeInclusive;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -15,6 +16,22 @@ pub const PX_PER_CM_RANGE: RangeInclusive<i64> = 10..=100;
 pub struct SpaceContext {
     pub settings: SpaceSettings,
     pub state: SpaceState,
+}
+
+impl SpaceContext {
+    pub fn handle_drag(&mut self, ui: &mut egui::Ui, response: Response) {
+        if self.settings.is_drag_enabled && response.dragged() {
+            ui.ctx().set_cursor_icon(egui::CursorIcon::Grab);
+
+            let delta = response.drag_delta();
+            let dragging_coefficient = 1.0;
+
+            self.state.offset.0 += delta.x as f64 * dragging_coefficient;
+            self.state.offset.1 += delta.y as f64 * dragging_coefficient;
+
+            ui.ctx().request_repaint();
+        }
+    }
 }
 
 // Stored in pixels, unit length in centimeters
@@ -43,20 +60,10 @@ impl Default for SpaceState {
 }
 
 impl SpaceState {
-    pub fn update_offset(
-        &mut self, ui: &egui::Ui, response: &egui::Response, settings: &SpaceSettings,
-    ) {
-        if settings.is_drag_enabled && response.dragged() {
-            ui.ctx().set_cursor_icon(egui::CursorIcon::Grab);
+    pub fn handle_scroll(&mut self, input_state: &InputState) {
+        let delta = input_state.smooth_scroll_delta.y;
 
-            let delta = response.drag_delta();
-            let dragging_coefficient = 1.0;
-
-            self.offset.0 += delta.x as f64 * dragging_coefficient;
-            self.offset.1 += delta.y as f64 * dragging_coefficient;
-
-            ui.ctx().request_repaint();
-        }
+        self.pixels_per_centimeter += (delta as f64) * 0.1;
     }
 }
 
