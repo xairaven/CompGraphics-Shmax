@@ -73,6 +73,15 @@ pub struct SpaceSize {
     pub height: f64,
 }
 
+impl From<&Response> for SpaceSize {
+    fn from(response: &Response) -> Self {
+        Self {
+            width: response.rect.max.x as f64,
+            height: response.rect.max.y as f64,
+        }
+    }
+}
+
 pub trait Shapeable {
     fn screen_shape(&self, space_context: &SpaceContext) -> egui::Shape;
 }

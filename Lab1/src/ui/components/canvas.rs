@@ -58,10 +58,7 @@ impl CanvasComponent {
         context.space.settings.zero_point =
             Point2D::from(response.rect.center()).with_space_screen();
         // Setting canvas size
-        context.space.settings.size = SpaceSize {
-            width: response.rect.max.x as f64,
-            height: response.rect.max.y as f64,
-        };
+        context.space.settings.size = SpaceSize::from(&response);
 
         (response, painter)
     }
