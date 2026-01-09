@@ -155,7 +155,12 @@ impl Grid2D {
         };
 
         // OY Grid
-        for i in (-ticks_x.0 as i32)..=(ticks_x.1 as i32) {
+        let range = if self.is_negative_enabled {
+            -ticks_x.0 as i32..=ticks_x.1 as i32
+        } else {
+            0..=ticks_x.1 as i32
+        };
+        for i in range {
             if i == 0 {
                 continue;
             }
@@ -169,7 +174,12 @@ impl Grid2D {
         }
 
         // OX Grid
-        for i in (-ticks_y.0 as i32)..=(ticks_y.1 as i32) {
+        let range = if self.is_negative_enabled {
+            (-ticks_y.0 as i32)..=(ticks_y.1 as i32)
+        } else {
+            0..=(ticks_y.1 as i32)
+        };
+        for i in range {
             if i == 0 {
                 continue;
             }
