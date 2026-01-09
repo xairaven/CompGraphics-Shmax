@@ -12,5 +12,6 @@ categories = ["graphics"]
 workspace = true
 
 [dependencies]
+derive_more = { version = "2.1.1", features = ["full"] }
 egui = "0.33.3"
 nalgebra = "0.34.1"

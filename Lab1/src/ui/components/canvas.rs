@@ -1,11 +1,11 @@
 use crate::context::Context;
 use egui::{CentralPanel, Color32, Frame, Painter, Response, Sense, Shape};
 use geometry::figures::grid::Grid2DBuilder;
-use geometry::primitives::point2d::Point2D;
-use geometry::space::{Shapeable, SpaceSize};
 
 #[derive(Debug, Default)]
-pub struct CanvasComponent {}
+pub struct CanvasComponent;
+
+pub const IS_NEGATIVE_ENABLED: bool = false;
 
 impl CanvasComponent {
     pub fn show(&mut self, ui: &mut egui::Ui, context: &mut Context) {
@@ -13,9 +13,9 @@ impl CanvasComponent {
             Frame::canvas(ui.style())
                 .fill(Color32::WHITE)
                 .show(ui, |ui| {
-                    ui.input(|i| context.space.state.handle_scroll(i));
+                    ui.input(|i| context.viewport.handle_scroll(i));
                     let response = Self::pipeline(ui, context);
-                    context.space.handle_drag(ui, response);
+                    context.viewport.handle_pan(ui, response);
                 });
         });
     }
@@ -29,14 +29,18 @@ impl CanvasComponent {
         let mut lines = vec![];
 
         let grid = Grid2DBuilder::default()
-            .with_negative_enabled(false)
+            .with_negative_enabled(IS_NEGATIVE_ENABLED)
+            .with_units(
+                context.viewport.geometry.unit_length.value(),
+                context.viewport.geometry.unit_length.value(),
+            )
             .build()
-            .lines(&context.space);
+            .lines(&context.viewport);
         lines.extend(grid);
 
         lines
             .iter()
-            .map(|line| line.screen_shape(&context.space))
+            .map(|line| line.to_pixels(&context.viewport).to_shape())
             .collect()
     }
 
@@ -54,11 +58,9 @@ impl CanvasComponent {
         let (response, painter) =
             ui.allocate_painter(painter_size, Sense::click_and_drag());
 
-        // Setting zero point
-        context.space.settings.zero_point =
-            Point2D::from(response.rect.center()).with_space_screen();
-        // Setting canvas size
-        context.space.settings.size = SpaceSize::from(&response);
+        context
+            .viewport
+            .update_state(&response, IS_NEGATIVE_ENABLED);
 
         (response, painter)
     }

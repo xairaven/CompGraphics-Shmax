@@ -1,52 +1,62 @@
 use crate::math::angle::Angle;
 use crate::metadata::dot::DotMetadata;
 use crate::metadata::shape::ShapeMetadata;
-use crate::space::Space;
+use crate::units::{Centimeter, Pixel};
 use egui::epaint::CircleShape;
 use egui::{Pos2, Shape};
 use nalgebra::{Matrix3, SMatrix};
 
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Point2D {
-    pub x: f64,
-    pub y: f64,
+pub trait Pointable2D: Clone {
+    fn x(&self) -> f64;
+    fn y(&self) -> f64;
+}
 
-    space: Space,
+#[derive(Debug, Default, Clone, Copy, PartialEq)]
+pub struct Point2D {
+    pub x: Centimeter,
+    pub y: Centimeter,
 }
 
 impl Point2D {
     pub fn new(x: f64, y: f64) -> Self {
-        Point2D {
-            x,
-            y,
-            space: Space::Local,
+        Self {
+            x: Centimeter(x),
+            y: Centimeter(y),
         }
     }
 
     pub fn zero() -> Self {
-        Point2D {
-            x: 0.0,
-            y: 0.0,
-            space: Space::Local,
+        Self {
+            x: Centimeter(0.0),
+            y: Centimeter(0.0),
         }
     }
 
-    pub fn to_vector(&self) -> SMatrix<f64, 1, 3> {
-        SMatrix::<f64, 1, 3>::new(self.x, self.y, 1.0)
+    pub fn to_vector(self) -> SMatrix<f64, 1, 3> {
+        SMatrix::<f64, 1, 3>::new(*self.x, *self.y, 1.0)
     }
 
-    pub fn to_uv(&self, unit_length: f64) -> Self {
-        let factor = (std::f64::consts::PI / 6.0) / unit_length;
+    pub fn to_uv(self, unit_length: Centimeter) -> Self {
+        let factor = (std::f64::consts::PI / 6.0) / (*unit_length);
 
-        Self::new(self.x * factor, self.y * factor)
+        Self {
+            x: self.x * factor,
+            y: self.y * factor,
+        }
     }
 
     pub fn scale(self, scale_factor: f64) -> Self {
-        Self::new(self.x * scale_factor, self.y * scale_factor)
+        Self {
+            x: self.x * scale_factor,
+            y: self.y * scale_factor,
+        }
     }
 
-    pub fn offset(self, dx: f64, dy: f64) -> Self {
-        Self::new(self.x + dx, self.y + dy)
+    pub fn offset(self, dx: Centimeter, dy: Centimeter) -> Self {
+        Self {
+            x: self.x + dx,
+            y: self.y + dy,
+        }
     }
 
     pub fn rotate(self, angle: Angle, pivot: Point2D) -> Self {
@@ -60,17 +70,48 @@ impl Point2D {
             -f64::sin(radian),
             f64::cos(radian),
             0.0,
-            -pivot.x * (f64::cos(radian) - 1.0) + pivot.y * f64::sin(radian),
-            -pivot.y * (f64::cos(radian) - 1.0) - pivot.x * f64::sin(radian),
+            (-pivot.x * (f64::cos(radian) - 1.0) + pivot.y * f64::sin(radian)).into(),
+            (-pivot.y * (f64::cos(radian) - 1.0) - pivot.x * f64::sin(radian)).into(),
             1.0,
         );
 
         let result = vector * matrix;
 
         Self {
-            x: result.x,
-            y: result.y,
-            space: self.space,
+            x: Centimeter(result.x),
+            y: Centimeter(result.y),
+        }
+    }
+}
+
+impl Pointable2D for Point2D {
+    fn x(&self) -> f64 {
+        *self.x
+    }
+
+    fn y(&self) -> f64 {
+        *self.y
+    }
+}
+
+#[derive(Debug, Default, Clone, Copy, PartialEq)]
+pub struct Point2DPixel {
+    pub x: Pixel,
+    pub y: Pixel,
+}
+
+impl Point2DPixel {
+    pub fn new(x: f64, y: f64) -> Self {
+        Self {
+            x: Pixel(x),
+            y: Pixel(y),
+        }
+    }
+
+    pub fn zero() -> Self {
+        Self {
+            x: Pixel(0.0),
+            y: Pixel(0.0),
         }
     }
 
@@ -84,40 +125,29 @@ impl Point2D {
 
         Shape::Circle(shape)
     }
+}
 
-    pub fn space(&self) -> Space {
-        self.space
-    }
-
-    pub fn with_space_local(&self) -> Self {
-        Self {
-            x: self.x,
-            y: self.y,
-            space: Space::Local,
-        }
-    }
-
-    pub fn with_space_screen(&self) -> Self {
-        Self {
-            x: self.x,
-            y: self.y,
-            space: Space::Screen,
-        }
+impl From<Point2DPixel> for Pos2 {
+    fn from(point: Point2DPixel) -> Self {
+        Pos2::from([point.x.0 as f32, point.y.0 as f32])
     }
 }
 
-impl From<Point2D> for Pos2 {
-    fn from(point: Point2D) -> Self {
-        Pos2::from([point.x as f32, point.y as f32])
-    }
-}
-
-impl From<Pos2> for Point2D {
+impl From<Pos2> for Point2DPixel {
     fn from(pos: Pos2) -> Self {
-        Point2D {
-            x: pos.x as f64,
-            y: pos.y as f64,
-            space: Space::Local,
+        Self {
+            x: Pixel(pos.x as f64),
+            y: Pixel(pos.y as f64),
         }
+    }
+}
+
+impl Pointable2D for Point2DPixel {
+    fn x(&self) -> f64 {
+        *self.x
+    }
+
+    fn y(&self) -> f64 {
+        *self.y
     }
 }

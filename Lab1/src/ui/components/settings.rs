@@ -32,10 +32,10 @@ impl SettingsComponent {
                         ui.label("Pixels on Centimeter:");
                         ui.add(
                             DragValue::new(
-                                &mut context.space.state.pixels_per_centimeter,
+                                &mut context.viewport.geometry.pixels_per_centimeter,
                             )
                             .speed(1)
-                            .range(geometry::space::PX_PER_CM_RANGE),
+                            .range(geometry::viewport::PX_PER_CM_RANGE),
                         );
                     });
                 });

@@ -1,13 +1,11 @@
-use crate::convertible::Convertible;
 use crate::primitives::line2d::Line2D;
 use crate::primitives::point2d::Point2D;
-use crate::space::SpaceContext;
+use crate::viewport::Viewport;
 use egui::Stroke;
 
 pub mod defaults {
     use egui::{Color32, Stroke};
 
-    pub const UNIT_LENGTH: f64 = 1.0;
     pub const AXIS_RED: Stroke = Stroke {
         width: 2.0,
         color: Color32::RED,
@@ -24,8 +22,9 @@ pub mod defaults {
 
 pub struct Grid2DBuilder {
     pub is_negative_enabled: bool,
+
     pub origin: Point2D,
-    pub units: (Point2D, Point2D),
+    pub units: Point2D,
 
     pub axes_strokes: (Stroke, Stroke),
     pub grid_stroke: Stroke,
@@ -36,10 +35,7 @@ impl Default for Grid2DBuilder {
         Self {
             is_negative_enabled: true,
             origin: Point2D::new(0.0, 0.0),
-            units: (
-                Point2D::new(defaults::UNIT_LENGTH, 0.0),
-                Point2D::new(0.0, defaults::UNIT_LENGTH),
-            ),
+            units: Point2D::new(1.0, 1.0),
             axes_strokes: (defaults::AXIS_RED, defaults::AXIS_GREEN),
             grid_stroke: defaults::GRID_GRAY,
         }
@@ -52,8 +48,8 @@ impl Grid2DBuilder {
         self
     }
 
-    pub fn with_units(mut self, unit_x: Point2D, unit_y: Point2D) -> Self {
-        self.units = (unit_x, unit_y);
+    pub fn with_units(mut self, unit_x: f64, unit_y: f64) -> Self {
+        self.units = Point2D::new(unit_x, unit_y);
         self
     }
 
@@ -89,112 +85,15 @@ pub struct Grid2D {
     pub is_negative_enabled: bool,
 
     pub origin: Point2D,
-    pub units: (Point2D, Point2D),
+    pub units: Point2D,
 
     pub axes_strokes: (Stroke, Stroke),
     pub grid_stroke: Stroke,
 }
 
 impl Grid2D {
-    pub fn lines(&self, space_context: &SpaceContext) -> Vec<Line2D> {
-        // Grid sides (optimization): left & right
-        let width = (
-            (space_context.settings.size.width - space_context.settings.zero_point.x
-                + space_context.state.offset.0)
-                .pixels_to_centimeters(space_context),
-            (space_context.settings.size.width
-                - space_context.settings.zero_point.x
-                - space_context.state.offset.0)
-                .pixels_to_centimeters(space_context),
-        );
-
-        let height = (
-            (space_context.settings.size.height
-                - space_context.settings.zero_point.y
-                - space_context.state.offset.1)
-                .pixels_to_centimeters(space_context),
-            (space_context.settings.size.height - space_context.settings.zero_point.y
-                + space_context.state.offset.1)
-                .pixels_to_centimeters(space_context),
-        );
-
+    pub fn lines(&self, viewport: &Viewport) -> Vec<Line2D<Point2D>> {
         let mut lines = vec![];
-
-        let ticks_x = (
-            (width.0 - (width.0 % self.units.0.x)) / self.units.0.x,
-            (width.1 - (width.1 % self.units.0.x)) / self.units.0.x,
-        );
-        let ticks_y = (
-            (height.0 - (height.0 % self.units.1.y)) / self.units.1.y,
-            (height.1 - (height.1 % self.units.1.y)) / self.units.1.y,
-        );
-
-        let axis_x = Line2D {
-            start: Point2D::new(
-                if self.is_negative_enabled {
-                    -width.0
-                } else {
-                    0.0
-                },
-                self.units.0.y,
-            ),
-            end: Point2D::new(width.1, self.units.0.y),
-            stroke: self.axes_strokes.0,
-        };
-        let axis_y = Line2D {
-            start: Point2D::new(
-                self.units.1.x,
-                if self.is_negative_enabled {
-                    -height.0
-                } else {
-                    0.0
-                },
-            ),
-            end: Point2D::new(self.units.1.x, height.1),
-            stroke: self.axes_strokes.1,
-        };
-
-        // OY Grid
-        let range = if self.is_negative_enabled {
-            -ticks_x.0 as i32..=ticks_x.1 as i32
-        } else {
-            0..=ticks_x.1 as i32
-        };
-        for i in range {
-            if i == 0 {
-                continue;
-            }
-
-            let x = self.units.0.x * (i as f64);
-
-            let start = Point2D::new(x, axis_y.start.y);
-            let end = Point2D::new(x, axis_y.end.y);
-
-            lines.push(Line2D::new(start, end, self.grid_stroke));
-        }
-
-        // OX Grid
-        let range = if self.is_negative_enabled {
-            (-ticks_y.0 as i32)..=(ticks_y.1 as i32)
-        } else {
-            0..=(ticks_y.1 as i32)
-        };
-        for i in range {
-            if i == 0 {
-                continue;
-            }
-
-            let y = self.units.1.y * (i as f64);
-
-            let start = Point2D::new(axis_x.start.x, y);
-            let end = Point2D::new(axis_x.end.x, y);
-
-            lines.push(Line2D::new(start, end, self.grid_stroke));
-        }
-
-        // Pushing main axes
-        lines.push(axis_x);
-        lines.push(axis_y);
 
         lines
     }

@@ -1,30 +1,25 @@
 use crate::ui::modals::error::ErrorModal;
 use crate::utils::channel::Channel;
-use geometry::primitives::point2d::Point2D;
-use geometry::space::{SpaceContext, SpaceSettings, SpaceSize};
+use geometry::viewport::{Viewport, ViewportState};
 
 #[derive(Debug)]
 pub struct Context {
-    pub space: SpaceContext,
-
+    pub viewport: Viewport,
     pub errors_channel: Channel<ErrorModal>,
 }
 
 impl Default for Context {
     fn default() -> Self {
         Self {
-            space: SpaceContext {
-                settings: SpaceSettings {
-                    zero_point: Point2D::new(500.0, 500.0).with_space_screen(),
-                    size: SpaceSize {
-                        width: 100.0,
-                        height: 100.0,
-                    },
-                    unit_length: 1.0,
-                    is_drag_enabled: true,
-                },
-                state: Default::default(),
+            viewport: Viewport {
+                // Default settings like panning, zooming, etc.
+                config: Default::default(),
+                // Default geometry settings, can be updated by user
+                geometry: Default::default(),
+                // Initial viewport state, will be updated when the UI is built
+                state: ViewportState::default(),
             },
+
             errors_channel: Channel::default(),
         }
     }

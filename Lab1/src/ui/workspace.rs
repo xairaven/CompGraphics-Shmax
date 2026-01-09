@@ -10,7 +10,7 @@ pub struct Workspace {
 impl Workspace {
     pub fn new(_context: &Context) -> Self {
         Self {
-            canvas: CanvasComponent::default(),
+            canvas: CanvasComponent,
             settings: SettingsComponent::default(),
         }
     }
