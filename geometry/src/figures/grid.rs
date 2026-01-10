@@ -1,5 +1,6 @@
 use crate::primitives::line2d::Line2D;
 use crate::primitives::point2d::Point2D;
+use crate::units::Centimeter;
 use crate::viewport::Viewport;
 use egui::Stroke;
 
@@ -32,10 +33,11 @@ pub mod defaults {
 }
 
 pub struct Grid2DBuilder {
-    pub is_negative_enabled: bool,
-
     pub origin: Point2D,
     pub units: Point2D,
+
+    pub bounds_x: (Option<Centimeter>, Option<Centimeter>),
+    pub bounds_y: (Option<Centimeter>, Option<Centimeter>),
 
     pub axes_strokes: (Stroke, Stroke),
     pub grid_stroke: Stroke,
@@ -44,9 +46,12 @@ pub struct Grid2DBuilder {
 impl Default for Grid2DBuilder {
     fn default() -> Self {
         Self {
-            is_negative_enabled: true,
             origin: defaults::ORIGIN,
             units: defaults::UNITS,
+
+            bounds_x: (None, None),
+            bounds_y: (None, None),
+
             axes_strokes: (defaults::AXIS_RED, defaults::AXIS_GREEN),
             grid_stroke: defaults::GRID_GRAY,
         }
@@ -64,6 +69,20 @@ impl Grid2DBuilder {
         self
     }
 
+    pub fn with_bounds_x(
+        mut self, min: Option<Centimeter>, max: Option<Centimeter>,
+    ) -> Self {
+        self.bounds_x = (min, max);
+        self
+    }
+
+    pub fn with_bounds_y(
+        mut self, min: Option<Centimeter>, max: Option<Centimeter>,
+    ) -> Self {
+        self.bounds_y = (min, max);
+        self
+    }
+
     pub fn with_axes_strokes(mut self, stroke_x: Stroke, stroke_y: Stroke) -> Self {
         self.axes_strokes = (stroke_x, stroke_y);
         self
@@ -74,16 +93,13 @@ impl Grid2DBuilder {
         self
     }
 
-    pub fn with_negative_enabled(mut self, is_enabled: bool) -> Self {
-        self.is_negative_enabled = is_enabled;
-        self
-    }
-
     pub fn build(self) -> Grid2D {
         Grid2D {
             is_enabled: true,
             origin: self.origin,
             units: self.units,
+            bounds_x: self.bounds_x,
+            bounds_y: self.bounds_y,
             axes_strokes: self.axes_strokes,
             grid_stroke: self.grid_stroke,
         }
@@ -95,6 +111,9 @@ pub struct Grid2D {
 
     pub origin: Point2D,
     pub units: Point2D,
+
+    pub bounds_x: (Option<Centimeter>, Option<Centimeter>),
+    pub bounds_y: (Option<Centimeter>, Option<Centimeter>),
 
     pub axes_strokes: (Stroke, Stroke),
     pub grid_stroke: Stroke,

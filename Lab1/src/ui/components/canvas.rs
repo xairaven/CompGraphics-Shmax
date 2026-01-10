@@ -1,6 +1,7 @@
 use crate::context::Context;
 use egui::{CentralPanel, Color32, Frame, Painter, Response, Sense, Shape};
 use geometry::figures::grid::Grid2DBuilder;
+use geometry::units::Centimeter;
 
 #[derive(Debug, Default)]
 pub struct CanvasComponent;
@@ -27,6 +28,8 @@ impl CanvasComponent {
         let mut shapes = vec![];
 
         let grid: Vec<Shape> = Grid2DBuilder::default()
+            .with_bounds_x(Some(Centimeter(0.0)), Some(Centimeter(50.0)))
+            .with_bounds_y(Some(Centimeter(0.0)), Some(Centimeter(50.0)))
             .build()
             .lines(&context.viewport)
             .iter()
