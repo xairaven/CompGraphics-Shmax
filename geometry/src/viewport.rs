@@ -1,5 +1,5 @@
 use crate::primitives::point2d::Point2DPixel;
-use crate::units::Pixel;
+use crate::units::{Centimeter, Pixel};
 use egui::{InputState, Response};
 use std::ops::RangeInclusive;
 
@@ -38,6 +38,19 @@ impl Viewport {
         self.state.zero_point = zero_point;
         // Update viewport location
         self.state.bounds = bounds;
+    }
+
+    pub fn viewport_bounds_centimeter(&self) -> ViewportBounds<Centimeter> {
+        let bounds = &self.state.bounds;
+
+        ViewportBounds::<Centimeter> {
+            minimum_x: bounds.minimum_x.to_centimeters_x(self),
+            maximum_x: bounds.maximum_x.to_centimeters_x(self),
+            minimum_y: bounds.minimum_y.to_centimeters_y(self),
+            maximum_y: bounds.maximum_y.to_centimeters_y(self),
+            center_x: bounds.center_x.to_centimeters_x(self),
+            center_y: bounds.center_y.to_centimeters_y(self),
+        }
     }
 }
 
@@ -81,7 +94,7 @@ impl Default for ViewportGeometry {
 #[derive(Debug, Default)]
 pub struct ViewportState {
     pub zero_point: Point2DPixel,
-    pub bounds: ViewportBounds,
+    pub bounds: ViewportBounds<Pixel>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -94,7 +107,7 @@ pub enum ZeroPointLocation {
 }
 
 impl ZeroPointLocation {
-    pub fn get_point(&self, bounds: &ViewportBounds) -> Point2DPixel {
+    pub fn get_point(&self, bounds: &ViewportBounds<Pixel>) -> Point2DPixel {
         match self {
             ZeroPointLocation::Center => Point2DPixel {
                 x: bounds.center_x,
@@ -121,16 +134,16 @@ impl ZeroPointLocation {
 }
 
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
-pub struct ViewportBounds {
-    pub minimum_x: Pixel,
-    pub maximum_x: Pixel,
-    pub minimum_y: Pixel,
-    pub maximum_y: Pixel,
-    pub center_x: Pixel,
-    pub center_y: Pixel,
+pub struct ViewportBounds<Unit: Default + Clone> {
+    pub minimum_x: Unit,
+    pub maximum_x: Unit,
+    pub minimum_y: Unit,
+    pub maximum_y: Unit,
+    pub center_x: Unit,
+    pub center_y: Unit,
 }
 
-impl From<&Response> for ViewportBounds {
+impl From<&Response> for ViewportBounds<Pixel> {
     fn from(response: &Response) -> Self {
         let (center_x, center_y) = response.rect.center().into();
 

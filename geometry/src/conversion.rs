@@ -3,43 +3,57 @@ use crate::units::{Centimeter, Pixel};
 use crate::viewport::Viewport;
 
 impl Centimeter {
-    pub fn to_pixels(self, viewport: &Viewport) -> Pixel {
-        Pixel(self.value() * viewport.geometry.pixels_per_centimeter)
+    pub fn to_pixels_x(self, viewport: &Viewport) -> Pixel {
+        let value = viewport.state.zero_point.x.value()
+            + (self.value() * viewport.geometry.pixels_per_centimeter)
+            + viewport.geometry.offset.x.value();
+
+        Pixel(value)
+    }
+
+    pub fn to_pixels_y(self, viewport: &Viewport) -> Pixel {
+        let value = viewport.state.zero_point.y.value()
+            - (self.value() * viewport.geometry.pixels_per_centimeter)
+            + viewport.geometry.offset.y.value();
+
+        Pixel(value)
     }
 }
 
 impl Pixel {
-    pub fn to_centimeters(self, viewport: &Viewport) -> Centimeter {
-        Centimeter(self.value() / viewport.geometry.pixels_per_centimeter)
+    pub fn to_centimeters_x(self, viewport: &Viewport) -> Centimeter {
+        let value = (self.value()
+            - viewport.state.zero_point.x.value()
+            - viewport.geometry.offset.x.value())
+            / viewport.geometry.pixels_per_centimeter;
+
+        Centimeter(value)
+    }
+
+    pub fn to_centimeters_y(self, viewport: &Viewport) -> Centimeter {
+        let value = (-self.value()
+            + viewport.state.zero_point.y.value()
+            + viewport.geometry.offset.y.value())
+            / viewport.geometry.pixels_per_centimeter;
+
+        Centimeter(value)
     }
 }
 
 impl Point2D {
     pub fn to_pixels(self, viewport: &Viewport) -> Point2DPixel {
-        let x = viewport.state.zero_point.x.value()
-            + (self.x.value() * viewport.geometry.pixels_per_centimeter)
-            + viewport.geometry.offset.x.value();
+        let x = self.x.to_pixels_x(viewport);
+        let y = self.y.to_pixels_y(viewport);
 
-        let y = viewport.state.zero_point.y.value()
-            - (self.y.value() * viewport.geometry.pixels_per_centimeter)
-            + viewport.geometry.offset.y.value();
-
-        Point2DPixel::new(x, y)
+        Point2DPixel { x, y }
     }
 }
 
 impl Point2DPixel {
     pub fn to_centimeters(self, viewport: &Viewport) -> Point2D {
-        let x = (self.x.value()
-            - viewport.state.zero_point.x.value()
-            - viewport.geometry.offset.x.value())
-            / viewport.geometry.pixels_per_centimeter;
+        let x = self.x.to_centimeters_x(viewport);
+        let y = self.y.to_centimeters_y(viewport);
 
-        let y = (-self.y.value()
-            + viewport.state.zero_point.y.value()
-            + viewport.geometry.offset.y.value())
-            / viewport.geometry.pixels_per_centimeter;
-
-        Point2D::new(x, y)
+        Point2D { x, y }
     }
 }
