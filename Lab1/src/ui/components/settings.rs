@@ -38,9 +38,11 @@ impl SettingsComponent {
                             .range(geometry::viewport::PX_PER_CM_RANGE),
                         );
 
-                        if ui.button("Reset").clicked() {
-                            context.viewport.geometry.reset_pixels_per_centimeter();
-                        }
+                        ui.vertical_centered_justified(|ui| {
+                            if ui.button("Reset").clicked() {
+                                context.viewport.geometry.reset_pixels_per_centimeter();
+                            }
+                        });
                     });
 
                     ui.horizontal(|ui| {
