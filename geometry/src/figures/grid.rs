@@ -152,6 +152,10 @@ impl Grid2D {
     pub fn lines(&self, viewport: &Viewport) -> Vec<Line2D<Point2D>> {
         let mut lines = vec![];
 
+        if !self.is_enabled {
+            return lines;
+        }
+
         let (minimum_x, minimum_y) = self.bounds.find_minimums(viewport);
         let (maximum_x, maximum_y) = self.bounds.find_maximums(viewport);
 
