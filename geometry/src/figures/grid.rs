@@ -82,7 +82,6 @@ impl Grid2DBuilder {
     pub fn build(self) -> Grid2D {
         Grid2D {
             is_enabled: true,
-            is_negative_enabled: self.is_negative_enabled,
             origin: self.origin,
             units: self.units,
             axes_strokes: self.axes_strokes,
@@ -93,7 +92,6 @@ impl Grid2DBuilder {
 
 pub struct Grid2D {
     pub is_enabled: bool,
-    pub is_negative_enabled: bool,
 
     pub origin: Point2D,
     pub units: Point2D,

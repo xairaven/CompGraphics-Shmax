@@ -5,8 +5,6 @@ use geometry::figures::grid::Grid2DBuilder;
 #[derive(Debug, Default)]
 pub struct CanvasComponent;
 
-pub const IS_NEGATIVE_ENABLED: bool = false;
-
 impl CanvasComponent {
     pub fn show(&mut self, ui: &mut egui::Ui, context: &mut Context) {
         CentralPanel::default().show_inside(ui, |ui| {
@@ -29,7 +27,6 @@ impl CanvasComponent {
         let mut shapes = vec![];
 
         let grid: Vec<Shape> = Grid2DBuilder::default()
-            .with_negative_enabled(IS_NEGATIVE_ENABLED)
             .build()
             .lines(&context.viewport)
             .iter()
@@ -63,9 +60,7 @@ impl CanvasComponent {
         let (response, painter) =
             ui.allocate_painter(painter_size, Sense::click_and_drag());
 
-        context
-            .viewport
-            .update_state(&response, IS_NEGATIVE_ENABLED);
+        context.viewport.update_state(&response);
 
         (response, painter)
     }

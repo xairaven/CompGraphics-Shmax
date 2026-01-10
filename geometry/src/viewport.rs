@@ -31,24 +31,13 @@ impl Viewport {
         self.geometry.pixels_per_centimeter += (delta as f64) * 0.1;
     }
 
-    pub fn update_state(
-        &mut self, response: &Response, is_grid_with_negative_sectors: bool,
-    ) {
-        // Update viewport location
-        self.state.location = ViewportLocation::from(response);
-
+    pub fn update_state(&mut self, response: &Response) {
+        let bounds = ViewportBounds::from(response);
         // Update zero point
-        let point = if is_grid_with_negative_sectors {
-            Point2DPixel::from(response.rect.center())
-        } else {
-            const OFFSET: f64 = 50.0;
-
-            let x = self.state.location.minimum_x.value() + OFFSET;
-            let y = self.state.location.maximum_y.value() - OFFSET;
-
-            Point2DPixel::new(x, y)
-        };
-        self.state.zero_point = point;
+        let zero_point = self.geometry.zero_point_location.get_point(&bounds);
+        self.state.zero_point = zero_point;
+        // Update viewport location
+        self.state.bounds = bounds;
     }
 }
 
@@ -71,6 +60,7 @@ pub const PX_PER_CM_RANGE: RangeInclusive<f64> = 10.0..=100.0;
 
 #[derive(Debug)]
 pub struct ViewportGeometry {
+    pub zero_point_location: ZeroPointLocation,
     pub pixels_per_centimeter: f64,
     pub offset: Point2DPixel,
 }
@@ -78,6 +68,7 @@ pub struct ViewportGeometry {
 impl Default for ViewportGeometry {
     fn default() -> Self {
         Self {
+            zero_point_location: ZeroPointLocation::Center,
             pixels_per_centimeter: 20.0,
             offset: Point2DPixel {
                 x: Pixel(0.0),
@@ -90,24 +81,66 @@ impl Default for ViewportGeometry {
 #[derive(Debug, Default)]
 pub struct ViewportState {
     pub zero_point: Point2DPixel,
-    pub location: ViewportLocation,
+    pub bounds: ViewportBounds,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum ZeroPointLocation {
+    Center,
+    BottomLeftWithOffset { offset: Pixel },
+    TopLeftWithOffset { offset: Pixel },
+    BottomRightWithOffset { offset: Pixel },
+    TopRightWithOffset { offset: Pixel },
+}
+
+impl ZeroPointLocation {
+    pub fn get_point(&self, bounds: &ViewportBounds) -> Point2DPixel {
+        match self {
+            ZeroPointLocation::Center => Point2DPixel {
+                x: bounds.center_x,
+                y: bounds.center_y,
+            },
+            ZeroPointLocation::BottomLeftWithOffset { offset } => Point2DPixel::new(
+                bounds.minimum_x.value() + offset.value(),
+                bounds.maximum_y.value() - offset.value(),
+            ),
+            ZeroPointLocation::TopLeftWithOffset { offset } => Point2DPixel::new(
+                bounds.minimum_x.value() + offset.value(),
+                bounds.minimum_y.value() + offset.value(),
+            ),
+            ZeroPointLocation::BottomRightWithOffset { offset } => Point2DPixel::new(
+                bounds.maximum_x.value() - offset.value(),
+                bounds.maximum_y.value() - offset.value(),
+            ),
+            ZeroPointLocation::TopRightWithOffset { offset } => Point2DPixel::new(
+                bounds.maximum_x.value() - offset.value(),
+                bounds.minimum_y.value() + offset.value(),
+            ),
+        }
+    }
 }
 
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
-pub struct ViewportLocation {
+pub struct ViewportBounds {
     pub minimum_x: Pixel,
     pub maximum_x: Pixel,
     pub minimum_y: Pixel,
     pub maximum_y: Pixel,
+    pub center_x: Pixel,
+    pub center_y: Pixel,
 }
 
-impl From<&Response> for ViewportLocation {
+impl From<&Response> for ViewportBounds {
     fn from(response: &Response) -> Self {
+        let (center_x, center_y) = response.rect.center().into();
+
         Self {
             minimum_x: Pixel(response.rect.min.x as f64),
             maximum_x: Pixel(response.rect.max.x as f64),
             minimum_y: Pixel(response.rect.min.y as f64),
             maximum_y: Pixel(response.rect.max.y as f64),
+            center_x: Pixel(center_x as f64),
+            center_y: Pixel(center_y as f64),
         }
     }
 }

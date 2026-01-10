@@ -1,6 +1,7 @@
 use crate::ui::modals::error::ErrorModal;
 use crate::utils::channel::Channel;
-use geometry::viewport::{Viewport, ViewportState};
+use geometry::units::Pixel;
+use geometry::viewport::{Viewport, ViewportGeometry, ViewportState, ZeroPointLocation};
 
 #[derive(Debug)]
 pub struct Context {
@@ -15,7 +16,12 @@ impl Default for Context {
                 // Default settings like panning, zooming, etc.
                 config: Default::default(),
                 // Default geometry settings, can be updated by user
-                geometry: Default::default(),
+                geometry: ViewportGeometry {
+                    zero_point_location: ZeroPointLocation::BottomLeftWithOffset {
+                        offset: Pixel(50.0),
+                    },
+                    ..Default::default()
+                },
                 // Initial viewport state, will be updated when the UI is built
                 state: ViewportState::default(),
             },
