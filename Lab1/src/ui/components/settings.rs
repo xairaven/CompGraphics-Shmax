@@ -48,6 +48,12 @@ impl SettingsComponent {
                         ui.label("Zoom:");
                         ui.checkbox(&mut context.viewport.config.is_zoomable, "");
                     });
+
+                    ui.vertical_centered_justified(|ui| {
+                        if ui.button("Reset Offset").clicked() {
+                            context.viewport.geometry.reset_offset();
+                        }
+                    });
                 });
             });
     }

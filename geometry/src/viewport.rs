@@ -82,6 +82,12 @@ impl Default for ViewportGeometry {
     }
 }
 
+impl ViewportGeometry {
+    pub fn reset_offset(&mut self) {
+        self.offset = Point2DPixel::zero();
+    }
+}
+
 #[derive(Debug, Default)]
 pub struct ViewportState {
     pub zero_point: Point2DPixel,
