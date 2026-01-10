@@ -1,6 +1,6 @@
 use crate::primitives::line2d::Line2D;
 use crate::primitives::point2d::Point2D;
-use crate::units::{Centimeter, Pixel};
+use crate::units::Centimeter;
 use crate::viewport::Viewport;
 use egui::Stroke;
 
@@ -114,25 +114,28 @@ pub struct GridBounds {
 }
 
 impl GridBounds {
-    fn find_minimum(
-        screen_bound: Pixel, user_bound: Option<Centimeter>, viewport: &Viewport,
-    ) -> Centimeter {
-        let screen_bound = screen_bound.to_centimeters(viewport);
-        user_bound.map_or(screen_bound, |b| Centimeter(b.min(screen_bound.value())))
+    fn minimum_x(&self, screen_bound: Centimeter) -> Centimeter {
+        self.x
+            .0
+            .map_or(screen_bound, |c| Centimeter(c.max(screen_bound.value())))
     }
 
-    pub fn find_minimums(&self, viewport: &Viewport) -> (Centimeter, Centimeter) {
-        (
-            Self::find_minimum(viewport.state.bounds.minimum_x, self.x.0, viewport),
-            Self::find_minimum(viewport.state.bounds.minimum_y, self.x.0, viewport),
-        )
+    fn minimum_y(&self, screen_bound: Centimeter) -> Centimeter {
+        self.y
+            .0
+            .map_or(screen_bound, |c| Centimeter(c.max(screen_bound.value())))
     }
 
-    pub fn find_maximums(&self, viewport: &Viewport) -> (Centimeter, Centimeter) {
-        (
-            Self::find_minimum(viewport.state.bounds.maximum_x, self.x.1, viewport),
-            Self::find_minimum(viewport.state.bounds.maximum_y, self.x.1, viewport),
-        )
+    fn maximum_x(&self, screen_bound: Centimeter) -> Centimeter {
+        self.x
+            .1
+            .map_or(screen_bound, |c| Centimeter(c.min(screen_bound.value())))
+    }
+
+    fn maximum_y(&self, screen_bound: Centimeter) -> Centimeter {
+        self.y
+            .1
+            .map_or(screen_bound, |c| Centimeter(c.min(screen_bound.value())))
     }
 }
 
@@ -156,8 +159,12 @@ impl Grid2D {
             return lines;
         }
 
-        let (minimum_x, minimum_y) = self.bounds.find_minimums(viewport);
-        let (maximum_x, maximum_y) = self.bounds.find_maximums(viewport);
+        // Minimum and maximum bounds in centimeters for the viewport, clamped by the grid bounds
+        let viewport_bounds_cm = viewport.state.bounds.to_centimeters(viewport);
+        let minimum_x = self.bounds.minimum_x(viewport_bounds_cm.minimum_x);
+        let maximum_x = self.bounds.maximum_x(viewport_bounds_cm.maximum_x);
+        let minimum_y = self.bounds.minimum_y(viewport_bounds_cm.minimum_y);
+        let maximum_y = self.bounds.maximum_y(viewport_bounds_cm.maximum_y);
 
         let axis_x = Line2D {
             start: Point2D {
