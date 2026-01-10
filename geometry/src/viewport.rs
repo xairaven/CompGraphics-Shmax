@@ -1,5 +1,5 @@
 use crate::primitives::point2d::Point2DPixel;
-use crate::units::{Centimeter, Pixel};
+use crate::units::Pixel;
 use egui::{InputState, Response};
 use std::ops::RangeInclusive;
 
@@ -71,7 +71,6 @@ pub const PX_PER_CM_RANGE: RangeInclusive<f64> = 10.0..=100.0;
 
 #[derive(Debug)]
 pub struct ViewportGeometry {
-    pub unit_length: Centimeter,
     pub pixels_per_centimeter: f64,
     pub offset: Point2DPixel,
 }
@@ -79,7 +78,6 @@ pub struct ViewportGeometry {
 impl Default for ViewportGeometry {
     fn default() -> Self {
         Self {
-            unit_length: Centimeter(1.0),
             pixels_per_centimeter: 20.0,
             offset: Point2DPixel {
                 x: Pixel(0.0),
