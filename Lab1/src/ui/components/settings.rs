@@ -40,6 +40,11 @@ impl SettingsComponent {
                     });
 
                     ui.horizontal(|ui| {
+                        ui.label("Pan:");
+                        ui.checkbox(&mut context.viewport.config.is_pannable, "");
+                    });
+
+                    ui.horizontal(|ui| {
                         ui.label("Zoom:");
                         ui.checkbox(&mut context.viewport.config.is_zoomable, "");
                     });
