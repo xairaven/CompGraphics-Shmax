@@ -169,6 +169,7 @@ impl Grid2D {
         // Minimum and maximum bounds in centimeters for the viewport, clamped by the grid bounds
         let view_bounds = self.bounds.view_bounds(viewport);
 
+        // Axes
         let axis_x = Line2D {
             start: Point2D {
                 x: view_bounds.minimum_x,
@@ -180,8 +181,6 @@ impl Grid2D {
             },
             stroke: self.axes_strokes.0,
         };
-        lines.push(axis_x);
-
         let axis_y = Line2D {
             start: Point2D {
                 x: self.origin.x,
@@ -193,7 +192,55 @@ impl Grid2D {
             },
             stroke: self.axes_strokes.1,
         };
+
+        lines.push(axis_x);
         lines.push(axis_y);
+
+        // Grid itself
+        for x in
+            view_bounds.minimum_x.value() as i32..=view_bounds.maximum_x.value() as i32
+        {
+            if x == self.origin.x.value() as i32 {
+                continue;
+            }
+
+            if x % self.units.x.value() as i32 == 0 {
+                let line = Line2D {
+                    start: Point2D {
+                        x: Centimeter(x as f64),
+                        y: view_bounds.minimum_y,
+                    },
+                    end: Point2D {
+                        x: Centimeter(x as f64),
+                        y: view_bounds.maximum_y,
+                    },
+                    stroke: self.grid_stroke,
+                };
+                lines.push(line);
+            }
+        }
+        for y in
+            view_bounds.minimum_y.value() as i32..=view_bounds.maximum_y.value() as i32
+        {
+            if y == self.origin.y.value() as i32 {
+                continue;
+            }
+
+            if y % self.units.y.value() as i32 == 0 {
+                let line = Line2D {
+                    start: Point2D {
+                        x: view_bounds.minimum_x,
+                        y: Centimeter(y as f64),
+                    },
+                    end: Point2D {
+                        x: view_bounds.maximum_x,
+                        y: Centimeter(y as f64),
+                    },
+                    stroke: self.grid_stroke,
+                };
+                lines.push(line);
+            }
+        }
 
         lines
     }
