@@ -34,17 +34,17 @@ impl Viewport {
     pub fn update_state(
         &mut self, response: &Response, is_grid_with_negative_sectors: bool,
     ) {
-        // Update viewport size
-        self.state.size = ViewportSize::from(response);
+        // Update viewport location
+        self.state.location = ViewportLocation::from(response);
 
         // Update zero point
         let point = if is_grid_with_negative_sectors {
             Point2DPixel::from(response.rect.center())
         } else {
-            const OFFSET: f64 = 10.0;
+            const OFFSET: f64 = 50.0;
 
-            let x = OFFSET;
-            let y = self.state.size.height.value() - OFFSET;
+            let x = self.state.location.minimum_x.value() + OFFSET;
+            let y = self.state.location.maximum_y.value() - OFFSET;
 
             Point2DPixel::new(x, y)
         };
@@ -92,20 +92,24 @@ impl Default for ViewportGeometry {
 #[derive(Debug, Default)]
 pub struct ViewportState {
     pub zero_point: Point2DPixel,
-    pub size: ViewportSize,
+    pub location: ViewportLocation,
 }
 
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
-pub struct ViewportSize {
-    pub width: Pixel,
-    pub height: Pixel,
+pub struct ViewportLocation {
+    pub minimum_x: Pixel,
+    pub maximum_x: Pixel,
+    pub minimum_y: Pixel,
+    pub maximum_y: Pixel,
 }
 
-impl From<&Response> for ViewportSize {
+impl From<&Response> for ViewportLocation {
     fn from(response: &Response) -> Self {
         Self {
-            width: Pixel(response.rect.max.x as f64),
-            height: Pixel(response.rect.max.y as f64),
+            minimum_x: Pixel(response.rect.min.x as f64),
+            maximum_x: Pixel(response.rect.max.x as f64),
+            minimum_y: Pixel(response.rect.min.y as f64),
+            maximum_y: Pixel(response.rect.max.y as f64),
         }
     }
 }
