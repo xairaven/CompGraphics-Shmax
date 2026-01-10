@@ -39,19 +39,6 @@ impl Viewport {
         // Update viewport location
         self.state.bounds = bounds;
     }
-
-    pub fn viewport_bounds_centimeter(&self) -> ViewportBounds<Centimeter> {
-        let bounds = &self.state.bounds;
-
-        ViewportBounds::<Centimeter> {
-            minimum_x: bounds.minimum_x.to_centimeters_x(self),
-            maximum_x: bounds.maximum_x.to_centimeters_x(self),
-            minimum_y: bounds.minimum_y.to_centimeters_y(self),
-            maximum_y: bounds.maximum_y.to_centimeters_y(self),
-            center_x: bounds.center_x.to_centimeters_x(self),
-            center_y: bounds.center_y.to_centimeters_y(self),
-        }
-    }
 }
 
 #[derive(Debug)]
@@ -154,6 +141,24 @@ impl From<&Response> for ViewportBounds<Pixel> {
             maximum_y: Pixel(response.rect.max.y as f64),
             center_x: Pixel(center_x as f64),
             center_y: Pixel(center_y as f64),
+        }
+    }
+}
+
+impl ViewportBounds<Pixel> {
+    pub fn to_centimeters(&self, viewport: &Viewport) -> ViewportBounds<Centimeter> {
+        ViewportBounds::<Centimeter> {
+            minimum_x: self.minimum_x.to_centimeters_x(viewport),
+            maximum_x: self.maximum_x.to_centimeters_x(viewport),
+
+            // For example: in pixels, minimum Y is 35 an maximum Y is 500.
+            // In centimeters, minimum Y is 17.5 and maximum Y is 1.75 (for example).
+            // So we need to invert them.
+            minimum_y: self.maximum_y.to_centimeters_y(viewport),
+            maximum_y: self.minimum_y.to_centimeters_y(viewport),
+
+            center_x: self.center_x.to_centimeters_x(viewport),
+            center_y: self.center_y.to_centimeters_y(viewport),
         }
     }
 }
