@@ -114,29 +114,36 @@ pub struct GridBounds {
 }
 
 impl GridBounds {
-    fn minimum_x(&self, screen_bound: Centimeter) -> Centimeter {
-        self.x
-            .0
-            .map_or(screen_bound, |c| Centimeter(c.max(screen_bound.value())))
-    }
+    pub fn view_bounds(&self, viewport: &Viewport) -> ViewGridBounds {
+        // Canvas bounds in centimeters
+        let v = viewport.state.bounds.to_centimeters(viewport);
 
-    fn minimum_y(&self, screen_bound: Centimeter) -> Centimeter {
-        self.y
-            .0
-            .map_or(screen_bound, |c| Centimeter(c.max(screen_bound.value())))
+        ViewGridBounds {
+            minimum_x: self
+                .x
+                .0
+                .map_or(v.minimum_x, |c| Centimeter(c.max(v.minimum_x.value()))),
+            maximum_x: self
+                .x
+                .1
+                .map_or(v.maximum_x, |c| Centimeter(c.min(v.maximum_x.value()))),
+            minimum_y: self
+                .y
+                .0
+                .map_or(v.minimum_y, |c| Centimeter(c.max(v.minimum_y.value()))),
+            maximum_y: self
+                .y
+                .1
+                .map_or(v.maximum_y, |c| Centimeter(c.min(v.maximum_y.value()))),
+        }
     }
+}
 
-    fn maximum_x(&self, screen_bound: Centimeter) -> Centimeter {
-        self.x
-            .1
-            .map_or(screen_bound, |c| Centimeter(c.min(screen_bound.value())))
-    }
-
-    fn maximum_y(&self, screen_bound: Centimeter) -> Centimeter {
-        self.y
-            .1
-            .map_or(screen_bound, |c| Centimeter(c.min(screen_bound.value())))
-    }
+pub struct ViewGridBounds {
+    pub minimum_x: Centimeter,
+    pub maximum_x: Centimeter,
+    pub minimum_y: Centimeter,
+    pub maximum_y: Centimeter,
 }
 
 pub struct Grid2D {
@@ -160,19 +167,15 @@ impl Grid2D {
         }
 
         // Minimum and maximum bounds in centimeters for the viewport, clamped by the grid bounds
-        let viewport_bounds_cm = viewport.state.bounds.to_centimeters(viewport);
-        let minimum_x = self.bounds.minimum_x(viewport_bounds_cm.minimum_x);
-        let maximum_x = self.bounds.maximum_x(viewport_bounds_cm.maximum_x);
-        let minimum_y = self.bounds.minimum_y(viewport_bounds_cm.minimum_y);
-        let maximum_y = self.bounds.maximum_y(viewport_bounds_cm.maximum_y);
+        let view_bounds = self.bounds.view_bounds(viewport);
 
         let axis_x = Line2D {
             start: Point2D {
-                x: minimum_x,
+                x: view_bounds.minimum_x,
                 y: self.origin.y,
             },
             end: Point2D {
-                x: maximum_x,
+                x: view_bounds.maximum_x,
                 y: self.origin.y,
             },
             stroke: self.axes_strokes.0,
@@ -182,11 +185,11 @@ impl Grid2D {
         let axis_y = Line2D {
             start: Point2D {
                 x: self.origin.x,
-                y: minimum_y,
+                y: view_bounds.minimum_y,
             },
             end: Point2D {
                 x: self.origin.x,
-                y: maximum_y,
+                y: view_bounds.maximum_y,
             },
             stroke: self.axes_strokes.1,
         };
