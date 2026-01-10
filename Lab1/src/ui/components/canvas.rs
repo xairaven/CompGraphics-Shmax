@@ -26,22 +26,27 @@ impl CanvasComponent {
     }
 
     fn create_shapes(_ui: &mut egui::Ui, context: &mut Context) -> Vec<Shape> {
-        let mut lines = vec![];
+        let mut shapes = vec![];
 
-        let grid = Grid2DBuilder::default()
+        let grid: Vec<Shape> = Grid2DBuilder::default()
             .with_negative_enabled(IS_NEGATIVE_ENABLED)
-            .with_units(
-                context.viewport.geometry.unit_length.value(),
-                context.viewport.geometry.unit_length.value(),
-            )
             .build()
-            .lines(&context.viewport);
-        lines.extend(grid);
-
-        lines
+            .lines(&context.viewport)
             .iter()
             .map(|line| line.to_pixels(&context.viewport).to_shape())
-            .collect()
+            .collect();
+        shapes.extend(grid);
+
+        // Test point
+        // let point = Point2D::new(20.0, 20.0)
+        //     .to_pixels(&context.viewport)
+        //     .to_shape(&ShapeMetadata {
+        //         radius: 2.0,
+        //         color: Color32::BLACK,
+        //     });
+        // shapes.push(point);
+
+        shapes
     }
 
     fn draw(ui: &mut egui::Ui, context: &mut Context, shapes: Vec<Shape>) -> Response {
