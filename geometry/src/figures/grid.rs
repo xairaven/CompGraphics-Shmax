@@ -4,10 +4,21 @@ use crate::viewport::Viewport;
 use egui::Stroke;
 
 pub mod defaults {
+    use crate::primitives::point2d::Point2D;
+    use crate::units::Centimeter;
     use egui::{Color32, Stroke};
 
+    pub const ORIGIN: Point2D = Point2D {
+        x: Centimeter(0.0),
+        y: Centimeter(0.0),
+    };
+    pub const UNITS: Point2D = Point2D {
+        x: Centimeter(1.0),
+        y: Centimeter(1.0),
+    };
+
     pub const AXIS_RED: Stroke = Stroke {
-        width: 2.0,
+        width: 50.0,
         color: Color32::RED,
     };
     pub const AXIS_GREEN: Stroke = Stroke {
@@ -34,8 +45,8 @@ impl Default for Grid2DBuilder {
     fn default() -> Self {
         Self {
             is_negative_enabled: true,
-            origin: Point2D::new(0.0, 0.0),
-            units: Point2D::new(1.0, 1.0),
+            origin: defaults::ORIGIN,
+            units: defaults::UNITS,
             axes_strokes: (defaults::AXIS_RED, defaults::AXIS_GREEN),
             grid_stroke: defaults::GRID_GRAY,
         }
