@@ -61,6 +61,7 @@ impl Default for ViewportConfig {
 }
 
 pub const PX_PER_CM_RANGE: RangeInclusive<f64> = 10.0..=100.0;
+const DEFAULT_PX_PER_CM: f64 = 20.0;
 
 #[derive(Debug)]
 pub struct ViewportGeometry {
@@ -73,7 +74,7 @@ impl Default for ViewportGeometry {
     fn default() -> Self {
         Self {
             zero_point_location: ZeroPointLocation::Center,
-            pixels_per_centimeter: 20.0,
+            pixels_per_centimeter: DEFAULT_PX_PER_CM,
             offset: Point2DPixel {
                 x: Pixel(0.0),
                 y: Pixel(0.0),
@@ -83,6 +84,10 @@ impl Default for ViewportGeometry {
 }
 
 impl ViewportGeometry {
+    pub fn reset_pixels_per_centimeter(&mut self) {
+        self.pixels_per_centimeter = DEFAULT_PX_PER_CM;
+    }
+
     pub fn reset_offset(&mut self) {
         self.offset = Point2DPixel::zero();
     }
