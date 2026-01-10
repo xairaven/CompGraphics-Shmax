@@ -34,12 +34,21 @@ impl Viewport {
     pub fn update_state(
         &mut self, response: &Response, is_grid_with_negative_sectors: bool,
     ) {
-        if is_grid_with_negative_sectors {
-            self.state.zero_point = Point2DPixel::from(response.rect.center());
-        } else {
-        }
-
+        // Update viewport size
         self.state.size = ViewportSize::from(response);
+
+        // Update zero point
+        let point = if is_grid_with_negative_sectors {
+            Point2DPixel::from(response.rect.center())
+        } else {
+            const OFFSET: f64 = 10.0;
+
+            let x = OFFSET;
+            let y = self.state.size.height.value() - OFFSET;
+
+            Point2DPixel::new(x, y)
+        };
+        self.state.zero_point = point;
     }
 }
 
