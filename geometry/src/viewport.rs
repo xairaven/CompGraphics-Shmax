@@ -26,6 +26,10 @@ impl Viewport {
     }
 
     pub fn handle_scroll(&mut self, input_state: &InputState) {
+        if !self.config.is_zoomable {
+            return;
+        }
+
         let delta = input_state.smooth_scroll_delta.y;
 
         self.geometry.pixels_per_centimeter += (delta as f64) * 0.1;

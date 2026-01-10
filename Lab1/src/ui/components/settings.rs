@@ -38,6 +38,11 @@ impl SettingsComponent {
                             .range(geometry::viewport::PX_PER_CM_RANGE),
                         );
                     });
+
+                    ui.horizontal(|ui| {
+                        ui.label("Zoom:");
+                        ui.checkbox(&mut context.viewport.config.is_zoomable, "");
+                    });
                 });
             });
     }
