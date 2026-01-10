@@ -169,33 +169,6 @@ impl Grid2D {
         // Minimum and maximum bounds in centimeters for the viewport, clamped by the grid bounds
         let view_bounds = self.bounds.view_bounds(viewport);
 
-        // Axes
-        let axis_x = Line2D {
-            start: Point2D {
-                x: view_bounds.minimum_x,
-                y: self.origin.y,
-            },
-            end: Point2D {
-                x: view_bounds.maximum_x,
-                y: self.origin.y,
-            },
-            stroke: self.axes_strokes.0,
-        };
-        let axis_y = Line2D {
-            start: Point2D {
-                x: self.origin.x,
-                y: view_bounds.minimum_y,
-            },
-            end: Point2D {
-                x: self.origin.x,
-                y: view_bounds.maximum_y,
-            },
-            stroke: self.axes_strokes.1,
-        };
-
-        lines.push(axis_x);
-        lines.push(axis_y);
-
         // Grid itself
         for x in
             view_bounds.minimum_x.value() as i32..=view_bounds.maximum_x.value() as i32
@@ -241,6 +214,33 @@ impl Grid2D {
                 lines.push(line);
             }
         }
+
+        // Axes
+        let axis_x = Line2D {
+            start: Point2D {
+                x: view_bounds.minimum_x,
+                y: self.origin.y,
+            },
+            end: Point2D {
+                x: view_bounds.maximum_x,
+                y: self.origin.y,
+            },
+            stroke: self.axes_strokes.0,
+        };
+        let axis_y = Line2D {
+            start: Point2D {
+                x: self.origin.x,
+                y: view_bounds.minimum_y,
+            },
+            end: Point2D {
+                x: self.origin.x,
+                y: view_bounds.maximum_y,
+            },
+            stroke: self.axes_strokes.1,
+        };
+
+        lines.push(axis_x);
+        lines.push(axis_y);
 
         lines
     }
