@@ -31,8 +31,8 @@ impl CanvasComponent {
         let mut lines = vec![];
 
         let grid: Vec<Line2D<Point2D>> = Grid2DBuilder::default()
-            .with_bounds_x(Some(Centimeter(0.0)), Some(Centimeter(50.0)))
-            .with_bounds_y(Some(Centimeter(0.0)), Some(Centimeter(50.0)))
+            .with_bounds_x(Some(Centimeter(0.0)), Some(Centimeter(120.0)))
+            .with_bounds_y(Some(Centimeter(0.0)), Some(Centimeter(120.0)))
             .build()
             .lines(&context.viewport);
         lines.extend(grid);
