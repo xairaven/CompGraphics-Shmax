@@ -2,6 +2,7 @@ pub mod conversion;
 pub mod units;
 pub mod viewport;
 pub mod figures {
+    pub mod detail;
     pub mod grid;
 }
 pub mod math {
