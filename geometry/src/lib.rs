@@ -13,6 +13,7 @@ pub mod metadata {
     pub mod shape;
 }
 pub mod primitives {
+    pub mod circle;
     pub mod line2d;
     pub mod point2d;
 }
