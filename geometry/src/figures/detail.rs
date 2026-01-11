@@ -1,11 +1,53 @@
+use crate::primitives::circle::{CircularShape, ShapeType};
+use crate::primitives::line2d::Line2D;
 use crate::primitives::point2d::Point2D;
 use crate::units::Centimeter;
+use egui::Stroke;
+
+pub mod defaults {
+    use egui::{Color32, Stroke};
+
+    pub const DETAIL_BLACK: Stroke = Stroke {
+        width: 3.0,
+        color: Color32::BLACK,
+    };
+}
 
 #[derive(Debug)]
 pub struct Detail {
     pub points: DetailPoints,
     pub lengths: DetailSideLengths,
     pub radiuses: DetailRadiuses,
+
+    pub stroke: Stroke,
+}
+
+impl Default for Detail {
+    fn default() -> Self {
+        Self {
+            points: DetailPoints::default(),
+            lengths: DetailSideLengths::default(),
+            radiuses: DetailRadiuses::default(),
+            stroke: defaults::DETAIL_BLACK,
+        }
+    }
+}
+
+impl Detail {
+    pub fn lines(&self) -> Vec<Line2D<Point2D>> {
+        let mut lines = vec![];
+
+        let inner_circle = CircularShape {
+            center: self.points.m,
+            radius: self.radiuses.inner,
+            shape_type: ShapeType::Full,
+            stroke: defaults::DETAIL_BLACK,
+        }
+        .lines(128);
+        lines.extend(inner_circle);
+
+        lines
+    }
 }
 
 #[derive(Debug)]
