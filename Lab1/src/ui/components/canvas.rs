@@ -1,6 +1,9 @@
 use crate::context::Context;
 use egui::{CentralPanel, Color32, Frame, Painter, Response, Sense, Shape};
+use geometry::figures::detail::Detail;
 use geometry::figures::grid::Grid2DBuilder;
+use geometry::primitives::line2d::Line2D;
+use geometry::primitives::point2d::Point2D;
 use geometry::units::Centimeter;
 
 #[derive(Debug, Default)]
@@ -25,28 +28,22 @@ impl CanvasComponent {
     }
 
     fn create_shapes(_ui: &mut egui::Ui, context: &mut Context) -> Vec<Shape> {
-        let mut shapes = vec![];
+        let mut lines = vec![];
 
-        let grid: Vec<Shape> = Grid2DBuilder::default()
+        let grid: Vec<Line2D<Point2D>> = Grid2DBuilder::default()
             .with_bounds_x(Some(Centimeter(0.0)), Some(Centimeter(50.0)))
             .with_bounds_y(Some(Centimeter(0.0)), Some(Centimeter(50.0)))
             .build()
-            .lines(&context.viewport)
+            .lines(&context.viewport);
+        lines.extend(grid);
+
+        let detail = Detail::default().lines();
+        lines.extend(detail);
+
+        lines
             .iter()
             .map(|line| line.to_pixels(&context.viewport).to_shape())
-            .collect();
-        shapes.extend(grid);
-
-        // Test point
-        // let point = Point2D::new(20.0, 20.0)
-        //     .to_pixels(&context.viewport)
-        //     .to_shape(&ShapeMetadata {
-        //         radius: 2.0,
-        //         color: Color32::BLACK,
-        //     });
-        // shapes.push(point);
-
-        shapes
+            .collect()
     }
 
     fn draw(ui: &mut egui::Ui, context: &mut Context, shapes: Vec<Shape>) -> Response {
