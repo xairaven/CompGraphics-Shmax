@@ -60,7 +60,7 @@ impl Default for ViewportConfig {
     }
 }
 
-pub const PX_PER_CM_RANGE: RangeInclusive<f64> = 10.0..=100.0;
+pub const PX_PER_CM_RANGE: RangeInclusive<f64> = 1.0..=100.0;
 const DEFAULT_PX_PER_CM: f64 = 20.0;
 
 #[derive(Debug)]
