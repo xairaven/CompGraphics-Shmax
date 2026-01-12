@@ -172,6 +172,10 @@ impl Detail {
         *start = new_start;
         *end = new_end;
     }
+
+    pub fn reset_all(&mut self) {
+        *self = Self::default();
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]

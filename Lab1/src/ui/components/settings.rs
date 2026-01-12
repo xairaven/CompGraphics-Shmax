@@ -90,6 +90,8 @@ impl SettingsComponent {
                             ui.label("Lengths");
                         });
 
+                        ui.add_space(5.0);
+
                         Grid::new("Lengths_GRID").num_columns(4).show(ui, |ui| {
                             for (i, segment) in SegmentId::iter().enumerate() {
                                 Self::length_radius_drag(
@@ -103,12 +105,14 @@ impl SettingsComponent {
                                 }
                             }
                         });
-                    });
 
-                    ui.group(|ui| {
+                        ui.add_space(10.0);
+
                         ui.vertical_centered(|ui| {
                             ui.label("Radiuses");
                         });
+
+                        ui.add_space(5.0);
 
                         Grid::new("Radiuses_GRID").num_columns(4).show(ui, |ui| {
                             Self::length_radius_drag(
@@ -123,6 +127,14 @@ impl SettingsComponent {
                             );
 
                             ui.end_row();
+                        });
+
+                        ui.add_space(10.0);
+
+                        ui.vertical_centered_justified(|ui| {
+                            if ui.button("Reset All").clicked() {
+                                context.figures.detail.reset_all();
+                            }
                         });
                     });
                 });
