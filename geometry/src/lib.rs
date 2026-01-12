@@ -17,3 +17,8 @@ pub mod primitives {
     pub mod line2d;
     pub mod point2d;
 }
+pub mod transformations {
+    pub mod euclidean {
+        pub mod offset;
+    }
+}

@@ -26,7 +26,7 @@ impl SettingsComponent {
             .show_inside(ui, |ui| {
                 ScrollArea::vertical().show(ui, |ui| {
                     ui.vertical_centered_justified(|ui| {
-                        ui.heading("Settings");
+                        ui.heading(RichText::new("Settings").color(Color32::WHITE));
                     });
 
                     ui.add_space(10.0);
@@ -137,6 +137,58 @@ impl SettingsComponent {
                             }
                         });
                     });
+
+                    ui.separator();
+
+                    ui.vertical_centered_justified(|ui| {
+                        ui.label(
+                            RichText::new("Euclidean Transformations")
+                                .color(Color32::WHITE),
+                        );
+                    });
+
+                    ui.group(|ui| {
+                        ui.vertical_centered(|ui| {
+                            ui.label("Offset");
+                        });
+
+                        ui.add_space(5.0);
+
+                        Grid::new("EUCLIDEAN_OFFSET").num_columns(4).show(ui, |ui| {
+                            ui.label("X:");
+                            ui.add(
+                                DragValue::new(&mut context.transformations.offset.x.0)
+                                    .speed(0.1)
+                                    .range(0.0..=f32::INFINITY)
+                                    .fixed_decimals(2),
+                            );
+
+                            ui.label("Y:");
+                            ui.add(
+                                DragValue::new(&mut context.transformations.offset.y.0)
+                                    .speed(0.1)
+                                    .range(0.0..=f32::INFINITY)
+                                    .fixed_decimals(2),
+                            );
+                        });
+
+                        ui.add_space(5.0);
+
+                        ui.horizontal(|ui| {
+                            ui.columns(2, |ui| {
+                                ui[0].vertical_centered_justified(|ui| {
+                                    if ui.button("Apply").clicked() {
+                                        context.transformations.offset.enable();
+                                    }
+                                });
+                                ui[1].vertical_centered_justified(|ui| {
+                                    if ui.button("Reset").clicked() {
+                                        context.transformations.offset.reset();
+                                    }
+                                });
+                            });
+                        });
+                    })
                 });
             });
     }

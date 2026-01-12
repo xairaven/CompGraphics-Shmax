@@ -52,13 +52,6 @@ impl Point2D {
         }
     }
 
-    pub fn offset(self, dx: Centimeter, dy: Centimeter) -> Self {
-        Self {
-            x: self.x + dx,
-            y: self.y + dy,
-        }
-    }
-
     pub fn rotate(self, angle: Angle, pivot: Point2D) -> Self {
         let radian = angle.radian();
 

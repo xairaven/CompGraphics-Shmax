@@ -2,12 +2,14 @@ use crate::ui::modals::error::ErrorModal;
 use crate::utils::channel::Channel;
 use geometry::figures::detail::Detail;
 use geometry::figures::grid::{Grid2D, Grid2DBuilder};
+use geometry::transformations::euclidean::offset::EuclideanOffset;
 use geometry::units::{Centimeter, Pixel};
 use geometry::viewport::{Viewport, ViewportGeometry, ViewportState, ZeroPointLocation};
 
 #[derive(Debug)]
 pub struct Context {
     pub figures: FiguresState,
+    pub transformations: TransformContext,
     pub viewport: Viewport,
     pub errors_channel: Channel<ErrorModal>,
 }
@@ -16,6 +18,7 @@ impl Default for Context {
     fn default() -> Self {
         Self {
             figures: FiguresState::default(),
+            transformations: TransformContext::default(),
 
             viewport: Viewport {
                 // Default settings like panning, zooming, etc.
@@ -53,4 +56,9 @@ impl Default for FiguresState {
             detail: Default::default(),
         }
     }
+}
+
+#[derive(Debug, Default)]
+pub struct TransformContext {
+    pub offset: EuclideanOffset,
 }

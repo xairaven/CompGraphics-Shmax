@@ -30,7 +30,8 @@ impl CanvasComponent {
         let grid: Vec<Line2D<Point2D>> = context.figures.grid.lines(&context.viewport);
         lines.extend(grid);
 
-        let detail = context.figures.detail.lines();
+        let mut detail = context.figures.detail.lines();
+        context.transformations.offset.process_lines(&mut detail);
         lines.extend(detail);
 
         lines
