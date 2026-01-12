@@ -35,8 +35,28 @@ impl CircularShape {
             .collect::<Vec<Line2D<Point2D>>>()
     }
 
-    // Resolution is the number of segments for a full circle.
-    fn polyline(&self, resolution: usize) -> Vec<Point2D> {
+    pub fn endpoints(&self) -> (Point2D, Point2D) {
+        let (start_angle, end_angle) = self.start_end_angles();
+
+        // Calculating coordinates for these two angles
+        let r = self.radius.value();
+        let cx = self.center.x.value();
+        let cy = self.center.y.value();
+
+        let start_point = Point2D {
+            x: Centimeter(cx + r * start_angle.cos()),
+            y: Centimeter(cy + r * start_angle.sin()),
+        };
+
+        let end_point = Point2D {
+            x: Centimeter(cx + r * end_angle.cos()),
+            y: Centimeter(cy + r * end_angle.sin()),
+        };
+
+        (start_point, end_point)
+    }
+
+    fn start_end_angles(&self) -> (f64, f64) {
         let (start_angle, end_angle) = match self.shape_type {
             ShapeType::Full => (0.0, std::f64::consts::TAU), // TAU = 2 * PI
             ShapeType::Semi { angle } => {
@@ -48,6 +68,13 @@ impl CircularShape {
                 )
             },
         };
+
+        (start_angle, end_angle)
+    }
+
+    // Resolution is the number of segments for a full circle.
+    fn polyline(&self, resolution: usize) -> Vec<Point2D> {
+        let (start_angle, end_angle) = self.start_end_angles();
 
         // Calculating factual number of steps for the arc
         // If it's a semicircle, steps will be half of resolution
