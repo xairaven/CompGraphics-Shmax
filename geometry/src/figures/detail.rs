@@ -1,4 +1,3 @@
-use crate::math::angle::Angle;
 use crate::primitives::circle::{CircularShape, ShapeType};
 use crate::primitives::line2d::Line2D;
 use crate::primitives::point2d::Point2D;
@@ -61,14 +60,12 @@ impl Detail {
             lines.push(line);
         }
 
-        let outer_circle = CircularShape {
-            center: self.points.m,
-            radius: self.radiuses.outer,
-            shape_type: ShapeType::Semi {
-                angle: Angle::from_degree(180.0),
-            },
-            stroke: defaults::DETAIL_BLACK,
-        }
+        let outer_circle = CircularShape::from_points_and_radius(
+            self.points.l,
+            self.points.a,
+            self.radiuses.outer,
+            self.stroke,
+        )
         .lines(128);
         lines.extend(outer_circle);
 
