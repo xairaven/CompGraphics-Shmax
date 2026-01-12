@@ -1,10 +1,7 @@
 use crate::context::Context;
 use egui::{CentralPanel, Color32, Frame, Painter, Response, Sense, Shape};
-use geometry::figures::detail::Detail;
-use geometry::figures::grid::Grid2DBuilder;
 use geometry::primitives::line2d::Line2D;
 use geometry::primitives::point2d::Point2D;
-use geometry::units::Centimeter;
 
 #[derive(Debug, Default)]
 pub struct CanvasComponent;
@@ -30,14 +27,10 @@ impl CanvasComponent {
     fn create_shapes(_ui: &mut egui::Ui, context: &mut Context) -> Vec<Shape> {
         let mut lines = vec![];
 
-        let grid: Vec<Line2D<Point2D>> = Grid2DBuilder::default()
-            .with_bounds_x(Some(Centimeter(0.0)), Some(Centimeter(120.0)))
-            .with_bounds_y(Some(Centimeter(0.0)), Some(Centimeter(120.0)))
-            .build()
-            .lines(&context.viewport);
+        let grid: Vec<Line2D<Point2D>> = context.figures.grid.lines(&context.viewport);
         lines.extend(grid);
 
-        let detail = Detail::default().lines();
+        let detail = context.figures.detail.lines();
         lines.extend(detail);
 
         lines

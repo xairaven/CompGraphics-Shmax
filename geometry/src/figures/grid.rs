@@ -108,6 +108,7 @@ impl Grid2DBuilder {
     }
 }
 
+#[derive(Debug)]
 pub struct GridBounds {
     pub x: (Option<Centimeter>, Option<Centimeter>),
     pub y: (Option<Centimeter>, Option<Centimeter>),
@@ -146,6 +147,7 @@ pub struct ViewGridBounds {
     pub maximum_y: Centimeter,
 }
 
+#[derive(Debug)]
 pub struct Grid2D {
     pub is_enabled: bool,
 
