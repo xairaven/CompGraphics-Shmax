@@ -25,22 +25,14 @@ impl CircularShape {
     pub fn lines(&self, resolution: usize) -> Vec<Line2D<Point2D>> {
         let points = self.polyline(resolution);
 
-        let mut lines = points
+        points
             .windows(2)
             .map(|pair| Line2D {
                 start: pair[0],
                 end: pair[1],
                 stroke: self.stroke,
             })
-            .collect::<Vec<Line2D<Point2D>>>();
-
-        lines.push(Line2D {
-            start: points[0],
-            end: points[points.len() - 1],
-            stroke: self.stroke,
-        });
-
-        lines
+            .collect::<Vec<Line2D<Point2D>>>()
     }
 
     // Resolution is the number of segments for a full circle.

@@ -1,3 +1,4 @@
+use crate::math::angle::Angle;
 use crate::primitives::circle::{CircularShape, ShapeType};
 use crate::primitives::line2d::Line2D;
 use crate::primitives::point2d::Point2D;
@@ -36,6 +37,17 @@ impl Default for Detail {
 impl Detail {
     pub fn lines(&self) -> Vec<Line2D<Point2D>> {
         let mut lines = vec![];
+
+        let outer_circle = CircularShape {
+            center: self.points.m,
+            radius: self.radiuses.outer,
+            shape_type: ShapeType::Semi {
+                angle: Angle::from_degree(180.0),
+            },
+            stroke: defaults::DETAIL_BLACK,
+        }
+        .lines(128);
+        lines.extend(outer_circle);
 
         let inner_circle = CircularShape {
             center: self.points.m,
