@@ -1,5 +1,6 @@
 use crate::context::Context;
 use egui::{DragValue, ScrollArea, SidePanel};
+use geometry::figures::grid;
 
 #[derive(Debug)]
 pub struct SettingsComponent {
@@ -41,6 +42,21 @@ impl SettingsComponent {
                         ui.vertical_centered_justified(|ui| {
                             if ui.button("Reset").clicked() {
                                 context.viewport.geometry.reset_pixels_per_centimeter();
+                            }
+                        });
+                    });
+
+                    ui.horizontal(|ui| {
+                        ui.label("Unit Length:");
+                        ui.add(
+                            DragValue::new(&mut context.figures.grid.unit.0)
+                                .speed(1)
+                                .range(grid::UNIT_RANGE),
+                        );
+
+                        ui.vertical_centered_justified(|ui| {
+                            if ui.button("Reset").clicked() {
+                                context.figures.grid.reset_unit();
                             }
                         });
                     });
