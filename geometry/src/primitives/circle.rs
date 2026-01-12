@@ -102,25 +102,40 @@ impl CircularShape {
             .collect::<Vec<Line2D<Point2D>>>()
     }
 
-    pub fn endpoints(&self) -> (Point2D, Point2D) {
-        let (start_angle, end_angle) = self.start_end_angles();
+    pub fn resize_by_radius(p1: &mut Point2D, p2: &mut Point2D, radius: &Centimeter) {
+        let mid_x = (p1.x.value() + p2.x.value()) / 2.0;
+        let mid_y = (p1.y.value() + p2.y.value()) / 2.0;
 
-        // Calculating coordinates for these two angles
-        let r = self.radius.value();
-        let cx = self.center.x.value();
-        let cy = self.center.y.value();
+        let dx = p2.x.value() - p1.x.value();
+        let dy = p2.y.value() - p1.y.value();
+        let current_len = (dx.powi(2) + dy.powi(2)).sqrt();
 
-        let start_point = Point2D {
-            x: Centimeter(cx + r * start_angle.cos()),
-            y: Centimeter(cy + r * start_angle.sin()),
+        if current_len < 1e-6 {
+            return;
+        }
+
+        let ux = dx / current_len;
+        let uy = dy / current_len;
+
+        let r_val = radius.value();
+
+        *p1 = Point2D {
+            x: Centimeter(mid_x - ux * r_val),
+            y: Centimeter(mid_y - uy * r_val),
         };
 
-        let end_point = Point2D {
-            x: Centimeter(cx + r * end_angle.cos()),
-            y: Centimeter(cy + r * end_angle.sin()),
+        *p2 = Point2D {
+            x: Centimeter(mid_x + ux * r_val),
+            y: Centimeter(mid_y + uy * r_val),
         };
+    }
 
-        (start_point, end_point)
+    pub fn radius_by_points(p1: &Point2D, p2: &Point2D) -> Centimeter {
+        let dx = p2.x.value() - p1.x.value();
+        let dy = p2.y.value() - p1.y.value();
+        let dist = (dx.powi(2) + dy.powi(2)).sqrt();
+
+        Centimeter(dist / 2.0)
     }
 
     fn start_end_angles(&self) -> (f64, f64) {

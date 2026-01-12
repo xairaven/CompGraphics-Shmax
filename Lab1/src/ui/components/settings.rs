@@ -1,6 +1,6 @@
 use crate::context::Context;
 use egui::{Color32, DragValue, Grid, RichText, ScrollArea, SidePanel};
-use geometry::figures::detail::SegmentId;
+use geometry::figures::detail::{ArcId, SegmentId};
 use geometry::figures::grid;
 
 #[derive(Debug)]
@@ -114,12 +114,47 @@ impl SettingsComponent {
                             ui.end_row();
                         });
                     });
+
+                    ui.group(|ui| {
+                        ui.vertical_centered(|ui| {
+                            ui.label("Radiuses");
+                        });
+
+                        Grid::new("Radiuses_GRID").num_columns(4).show(ui, |ui| {
+                            ui.label("AL:");
+                            if ui
+                                .add(
+                                    DragValue::new(
+                                        &mut context.figures.detail.radiuses.outer.0,
+                                    )
+                                    .speed(0.1)
+                                    .fixed_decimals(2)
+                                    .range(0.1..=f32::INFINITY),
+                                )
+                                .changed()
+                            {
+                                context.figures.detail.update_radius_chain(ArcId::AL);
+                            };
+
+                            ui.label("M:");
+                            ui.add(
+                                DragValue::new(
+                                    &mut context.figures.detail.radiuses.inner.0,
+                                )
+                                .speed(0.1)
+                                .fixed_decimals(2)
+                                .range(0.1..=f32::INFINITY),
+                            );
+
+                            ui.end_row();
+                        });
+                    });
                 });
             });
     }
 
     fn length_drag(ui: &mut egui::Ui, context: &mut Context, segment: SegmentId) {
-        let length = segment.length(&mut context.figures.detail.lengths);
+        let length = segment.length(&mut context.figures.detail.sides);
 
         ui.label(format!("{:#?}:", segment));
         if ui
@@ -131,7 +166,7 @@ impl SettingsComponent {
             )
             .changed()
         {
-            context.figures.detail.update_chain(segment);
+            context.figures.detail.update_side_chain(segment);
         };
     }
 }

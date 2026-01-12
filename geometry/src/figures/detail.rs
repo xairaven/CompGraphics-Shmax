@@ -16,7 +16,7 @@ pub mod defaults {
 #[derive(Debug)]
 pub struct Detail {
     pub points: DetailPoints,
-    pub lengths: DetailSideLengths,
+    pub sides: DetailSideLengths,
     pub radiuses: DetailRadiuses,
 
     pub stroke: Stroke,
@@ -26,8 +26,8 @@ impl Default for Detail {
     fn default() -> Self {
         Self {
             points: DetailPoints::default(),
-            lengths: DetailSideLengths::default(),
-            radiuses: DetailRadiuses::default(),
+            sides: Default::default(),
+            radiuses: Default::default(),
             stroke: defaults::DETAIL_BLACK,
         }
     }
@@ -81,16 +81,45 @@ impl Detail {
         lines
     }
 
-    pub fn update_chain(&mut self, segment_id: SegmentId) {
+    pub fn update_chain(&mut self, element_id: DetailElementId) {
+        match element_id {
+            DetailElementId::Segment(segment_id) => self.update_side_chain(segment_id),
+            DetailElementId::Arc(arc_id) => self.update_radius_chain(arc_id),
+        }
+    }
+
+    pub fn update_side_chain(&mut self, segment_id: SegmentId) {
         let points = segment_id.points(&mut self.points);
-        let length = segment_id.length(&mut self.lengths);
+        let length = segment_id.length(&mut self.sides);
         Self::resize_line(points.0, points.1, length);
 
         let neighbours = segment_id.neighbours();
+        self.update_neighbours(neighbours);
+    }
+
+    pub fn update_radius_chain(&mut self, arc_id: ArcId) {
+        let points = arc_id.points(&mut self.points);
+        CircularShape::resize_by_radius(points.0, points.1, &self.radiuses.outer);
+
+        let neighbours = arc_id.neighbours();
+        self.update_neighbours(neighbours);
+    }
+
+    fn update_neighbours(&mut self, neighbours: &[DetailElementId]) {
         for neighbour in neighbours {
-            let points = neighbour.points(&mut self.points);
-            let length = neighbour.length(&mut self.lengths);
-            Self::update_line_length(points.0, points.1, length);
+            match neighbour {
+                DetailElementId::Segment(segment_id) => {
+                    let points = segment_id.points(&mut self.points);
+                    let length = segment_id.length(&mut self.sides);
+                    Self::update_line_length(points.0, points.1, length);
+                },
+                DetailElementId::Arc(arc_id) => {
+                    let points = arc_id.points(&mut self.points);
+                    let new_radius = CircularShape::radius_by_points(points.0, points.1);
+                    let current_radius = arc_id.radius(&mut self.radiuses);
+                    *current_radius = new_radius;
+                },
+            }
         }
     }
 
@@ -143,6 +172,42 @@ impl Detail {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
+pub enum DetailElementId {
+    Segment(SegmentId),
+    Arc(ArcId),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum ArcId {
+    AL,
+}
+
+impl ArcId {
+    pub fn points<'a>(
+        &self, points: &'a mut DetailPoints,
+    ) -> (&'a mut Point2D, &'a mut Point2D) {
+        match self {
+            Self::AL => (&mut points.l, &mut points.a),
+        }
+    }
+
+    pub fn radius<'a>(&self, radiuses: &'a mut DetailRadiuses) -> &'a mut Centimeter {
+        match self {
+            Self::AL => &mut radiuses.outer,
+        }
+    }
+
+    pub fn neighbours(&self) -> &'static [DetailElementId] {
+        match self {
+            Self::AL => &[
+                DetailElementId::Segment(SegmentId::AB),
+                DetailElementId::Segment(SegmentId::KL),
+            ],
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum SegmentId {
     AB,
     BC,
@@ -162,49 +227,82 @@ impl SegmentId {
         &self, points: &'a mut DetailPoints,
     ) -> (&'a mut Point2D, &'a mut Point2D) {
         match self {
-            SegmentId::AB => (&mut points.a, &mut points.b),
-            SegmentId::BC => (&mut points.b, &mut points.c),
-            SegmentId::CD => (&mut points.c, &mut points.d),
-            SegmentId::DE => (&mut points.d, &mut points.e),
-            SegmentId::EF => (&mut points.e, &mut points.f),
-            SegmentId::FG => (&mut points.f, &mut points.g),
-            SegmentId::GH => (&mut points.g, &mut points.h),
-            SegmentId::HI => (&mut points.h, &mut points.i),
-            SegmentId::IJ => (&mut points.i, &mut points.j),
-            SegmentId::JK => (&mut points.j, &mut points.k),
-            SegmentId::KL => (&mut points.k, &mut points.l),
+            Self::AB => (&mut points.a, &mut points.b),
+            Self::BC => (&mut points.b, &mut points.c),
+            Self::CD => (&mut points.c, &mut points.d),
+            Self::DE => (&mut points.d, &mut points.e),
+            Self::EF => (&mut points.e, &mut points.f),
+            Self::FG => (&mut points.f, &mut points.g),
+            Self::GH => (&mut points.g, &mut points.h),
+            Self::HI => (&mut points.h, &mut points.i),
+            Self::IJ => (&mut points.i, &mut points.j),
+            Self::JK => (&mut points.j, &mut points.k),
+            Self::KL => (&mut points.k, &mut points.l),
         }
     }
 
     pub fn length<'a>(&self, lengths: &'a mut DetailSideLengths) -> &'a mut Centimeter {
         match self {
-            SegmentId::AB => &mut lengths.ab,
-            SegmentId::BC => &mut lengths.bc,
-            SegmentId::CD => &mut lengths.cd,
-            SegmentId::DE => &mut lengths.de,
-            SegmentId::EF => &mut lengths.ef,
-            SegmentId::FG => &mut lengths.fg,
-            SegmentId::GH => &mut lengths.gh,
-            SegmentId::HI => &mut lengths.hi,
-            SegmentId::IJ => &mut lengths.ij,
-            SegmentId::JK => &mut lengths.jk,
-            SegmentId::KL => &mut lengths.kl,
+            Self::AB => &mut lengths.ab,
+            Self::BC => &mut lengths.bc,
+            Self::CD => &mut lengths.cd,
+            Self::DE => &mut lengths.de,
+            Self::EF => &mut lengths.ef,
+            Self::FG => &mut lengths.fg,
+            Self::GH => &mut lengths.gh,
+            Self::HI => &mut lengths.hi,
+            Self::IJ => &mut lengths.ij,
+            Self::JK => &mut lengths.jk,
+            Self::KL => &mut lengths.kl,
         }
     }
 
-    pub fn neighbours(&self) -> &'static [SegmentId] {
+    pub fn neighbours(&self) -> &'static [DetailElementId] {
         match self {
-            SegmentId::AB => &[SegmentId::BC],
-            SegmentId::BC => &[SegmentId::AB, SegmentId::CD],
-            SegmentId::CD => &[SegmentId::BC, SegmentId::DE],
-            SegmentId::DE => &[SegmentId::CD, SegmentId::EF],
-            SegmentId::EF => &[SegmentId::DE, SegmentId::FG],
-            SegmentId::FG => &[SegmentId::EF, SegmentId::GH],
-            SegmentId::GH => &[SegmentId::FG, SegmentId::HI],
-            SegmentId::HI => &[SegmentId::GH, SegmentId::IJ],
-            SegmentId::IJ => &[SegmentId::HI, SegmentId::JK],
-            SegmentId::JK => &[SegmentId::IJ, SegmentId::KL],
-            SegmentId::KL => &[SegmentId::JK],
+            Self::AB => &[
+                DetailElementId::Segment(Self::BC),
+                DetailElementId::Arc(ArcId::AL),
+            ],
+            Self::BC => &[
+                DetailElementId::Segment(Self::AB),
+                DetailElementId::Segment(Self::CD),
+            ],
+            Self::CD => &[
+                DetailElementId::Segment(Self::BC),
+                DetailElementId::Segment(Self::DE),
+            ],
+            Self::DE => &[
+                DetailElementId::Segment(Self::CD),
+                DetailElementId::Segment(Self::EF),
+            ],
+            Self::EF => &[
+                DetailElementId::Segment(Self::DE),
+                DetailElementId::Segment(Self::FG),
+            ],
+            Self::FG => &[
+                DetailElementId::Segment(Self::EF),
+                DetailElementId::Segment(Self::GH),
+            ],
+            Self::GH => &[
+                DetailElementId::Segment(Self::FG),
+                DetailElementId::Segment(Self::HI),
+            ],
+            Self::HI => &[
+                DetailElementId::Segment(Self::GH),
+                DetailElementId::Segment(Self::IJ),
+            ],
+            Self::IJ => &[
+                DetailElementId::Segment(Self::HI),
+                DetailElementId::Segment(Self::JK),
+            ],
+            Self::JK => &[
+                DetailElementId::Segment(Self::IJ),
+                DetailElementId::Segment(Self::KL),
+            ],
+            Self::KL => &[
+                DetailElementId::Segment(Self::JK),
+                DetailElementId::Arc(ArcId::AL),
+            ],
         }
     }
 }
