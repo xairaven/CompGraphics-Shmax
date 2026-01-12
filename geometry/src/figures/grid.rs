@@ -3,6 +3,7 @@ use crate::primitives::point2d::Point2D;
 use crate::units::Centimeter;
 use crate::viewport::Viewport;
 use egui::Stroke;
+use std::ops::RangeInclusive;
 
 pub mod defaults {
     use crate::primitives::point2d::Point2D;
@@ -13,10 +14,7 @@ pub mod defaults {
         x: Centimeter(0.0),
         y: Centimeter(0.0),
     };
-    pub const UNITS: Point2D = Point2D {
-        x: Centimeter(1.0),
-        y: Centimeter(1.0),
-    };
+    pub const UNIT: Centimeter = Centimeter(1.0);
 
     pub const AXIS_RED: Stroke = Stroke {
         width: 2.0,
@@ -31,10 +29,11 @@ pub mod defaults {
         color: Color32::GRAY,
     };
 }
+pub const UNIT_RANGE: RangeInclusive<f64> = RangeInclusive::new(1.0, 50.0);
 
 pub struct Grid2DBuilder {
     pub origin: Point2D,
-    pub units: Point2D,
+    pub unit: Centimeter,
 
     pub bounds_x: (Option<Centimeter>, Option<Centimeter>),
     pub bounds_y: (Option<Centimeter>, Option<Centimeter>),
@@ -47,7 +46,7 @@ impl Default for Grid2DBuilder {
     fn default() -> Self {
         Self {
             origin: defaults::ORIGIN,
-            units: defaults::UNITS,
+            unit: defaults::UNIT,
 
             bounds_x: (None, None),
             bounds_y: (None, None),
@@ -64,8 +63,8 @@ impl Grid2DBuilder {
         self
     }
 
-    pub fn with_units(mut self, unit_x: f64, unit_y: f64) -> Self {
-        self.units = Point2D::new(unit_x, unit_y);
+    pub fn with_unit(mut self, unit: Centimeter) -> Self {
+        self.unit = unit;
         self
     }
 
@@ -97,7 +96,7 @@ impl Grid2DBuilder {
         Grid2D {
             is_enabled: true,
             origin: self.origin,
-            units: self.units,
+            unit: self.unit,
             bounds: GridBounds {
                 x: (self.bounds_x.0, self.bounds_x.1),
                 y: (self.bounds_y.0, self.bounds_y.1),
@@ -152,7 +151,7 @@ pub struct Grid2D {
     pub is_enabled: bool,
 
     pub origin: Point2D,
-    pub units: Point2D,
+    pub unit: Centimeter,
 
     pub bounds: GridBounds,
 
@@ -179,7 +178,7 @@ impl Grid2D {
                 continue;
             }
 
-            if x % self.units.x.value() as i32 == 0 {
+            if x % self.unit.value() as i32 == 0 {
                 let line = Line2D {
                     start: Point2D {
                         x: Centimeter(x as f64),
@@ -201,7 +200,7 @@ impl Grid2D {
                 continue;
             }
 
-            if y % self.units.y.value() as i32 == 0 {
+            if y % self.unit.value() as i32 == 0 {
                 let line = Line2D {
                     start: Point2D {
                         x: view_bounds.minimum_x,
@@ -245,5 +244,9 @@ impl Grid2D {
         lines.push(axis_y);
 
         lines
+    }
+
+    pub fn reset_unit(&mut self) {
+        self.unit = defaults::UNIT;
     }
 }
