@@ -3,6 +3,7 @@ use crate::primitives::line2d::Line2D;
 use crate::primitives::point2d::Point2D;
 use crate::units::Centimeter;
 use egui::Stroke;
+use strum_macros::EnumIter;
 
 pub mod defaults {
     use egui::{Color32, Stroke};
@@ -85,6 +86,7 @@ impl Detail {
         match element_id {
             DetailElementId::Segment(segment_id) => self.update_side_chain(segment_id),
             DetailElementId::Arc(arc_id) => self.update_radius_chain(arc_id),
+            DetailElementId::Circle(_) => {},
         }
     }
 
@@ -119,6 +121,7 @@ impl Detail {
                     let current_radius = arc_id.radius(&mut self.radiuses);
                     *current_radius = new_radius;
                 },
+                _ => {},
             }
         }
     }
@@ -175,6 +178,20 @@ impl Detail {
 pub enum DetailElementId {
     Segment(SegmentId),
     Arc(ArcId),
+    Circle(CircleId),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum CircleId {
+    M,
+}
+
+impl CircleId {
+    pub fn radius<'a>(&self, radiuses: &'a mut DetailRadiuses) -> &'a mut Centimeter {
+        match self {
+            Self::M => &mut radiuses.inner,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -207,7 +224,7 @@ impl ArcId {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, EnumIter)]
 pub enum SegmentId {
     AB,
     BC,

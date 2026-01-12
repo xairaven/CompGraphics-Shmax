@@ -1,7 +1,8 @@
 use crate::context::Context;
 use egui::{Color32, DragValue, Grid, RichText, ScrollArea, SidePanel};
-use geometry::figures::detail::{ArcId, SegmentId};
+use geometry::figures::detail::{ArcId, CircleId, DetailElementId, SegmentId};
 use geometry::figures::grid;
+use strum::IntoEnumIterator;
 
 #[derive(Debug)]
 pub struct SettingsComponent {
@@ -90,28 +91,17 @@ impl SettingsComponent {
                         });
 
                         Grid::new("Lengths_GRID").num_columns(4).show(ui, |ui| {
-                            Self::length_drag(ui, context, SegmentId::AB);
-                            Self::length_drag(ui, context, SegmentId::BC);
-                            ui.end_row();
+                            for (i, segment) in SegmentId::iter().enumerate() {
+                                Self::length_radius_drag(
+                                    ui,
+                                    context,
+                                    DetailElementId::Segment(segment),
+                                );
 
-                            Self::length_drag(ui, context, SegmentId::CD);
-                            Self::length_drag(ui, context, SegmentId::DE);
-                            ui.end_row();
-
-                            Self::length_drag(ui, context, SegmentId::EF);
-                            Self::length_drag(ui, context, SegmentId::FG);
-                            ui.end_row();
-
-                            Self::length_drag(ui, context, SegmentId::GH);
-                            Self::length_drag(ui, context, SegmentId::HI);
-                            ui.end_row();
-
-                            Self::length_drag(ui, context, SegmentId::IJ);
-                            Self::length_drag(ui, context, SegmentId::JK);
-                            ui.end_row();
-
-                            Self::length_drag(ui, context, SegmentId::KL);
-                            ui.end_row();
+                                if (i + 1) % 2 == 0 {
+                                    ui.end_row();
+                                }
+                            }
                         });
                     });
 
@@ -121,29 +111,15 @@ impl SettingsComponent {
                         });
 
                         Grid::new("Radiuses_GRID").num_columns(4).show(ui, |ui| {
-                            ui.label("AL:");
-                            if ui
-                                .add(
-                                    DragValue::new(
-                                        &mut context.figures.detail.radiuses.outer.0,
-                                    )
-                                    .speed(0.1)
-                                    .fixed_decimals(2)
-                                    .range(0.1..=f32::INFINITY),
-                                )
-                                .changed()
-                            {
-                                context.figures.detail.update_radius_chain(ArcId::AL);
-                            };
-
-                            ui.label("M:");
-                            ui.add(
-                                DragValue::new(
-                                    &mut context.figures.detail.radiuses.inner.0,
-                                )
-                                .speed(0.1)
-                                .fixed_decimals(2)
-                                .range(0.1..=f32::INFINITY),
+                            Self::length_radius_drag(
+                                ui,
+                                context,
+                                DetailElementId::Arc(ArcId::AL),
+                            );
+                            Self::length_radius_drag(
+                                ui,
+                                context,
+                                DetailElementId::Circle(CircleId::M),
                             );
 
                             ui.end_row();
@@ -153,10 +129,29 @@ impl SettingsComponent {
             });
     }
 
-    fn length_drag(ui: &mut egui::Ui, context: &mut Context, segment: SegmentId) {
-        let length = segment.length(&mut context.figures.detail.sides);
+    fn length_radius_drag(
+        ui: &mut egui::Ui, context: &mut Context, element_id: DetailElementId,
+    ) {
+        let (label, length) = match element_id {
+            DetailElementId::Segment(segment_id) => {
+                let label = format!("{:#?}:", segment_id);
+                let length = segment_id.length(&mut context.figures.detail.sides);
+                (label, length)
+            },
+            DetailElementId::Arc(arc_id) => {
+                let label = format!("{:#?}:", arc_id);
+                let length = arc_id.radius(&mut context.figures.detail.radiuses);
+                (label, length)
+            },
+            DetailElementId::Circle(circle_id) => {
+                let label = format!("{:#?}:", circle_id);
+                let length = circle_id.radius(&mut context.figures.detail.radiuses);
+                (label, length)
+            },
+        };
 
-        ui.label(format!("{:#?}:", segment));
+        ui.label(label);
+
         if ui
             .add(
                 DragValue::new(&mut length.0)
@@ -166,7 +161,7 @@ impl SettingsComponent {
             )
             .changed()
         {
-            context.figures.detail.update_side_chain(segment);
+            context.figures.detail.update_chain(element_id);
         };
     }
 }
