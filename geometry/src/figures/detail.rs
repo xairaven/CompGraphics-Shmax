@@ -3,6 +3,7 @@ use crate::primitives::line2d::Line2D;
 use crate::primitives::point2d::Point2D;
 use crate::units::Centimeter;
 use egui::Stroke;
+use std::fmt::{Display, Formatter};
 
 pub mod defaults {
     use egui::{Color32, Stroke};
@@ -79,6 +80,147 @@ impl Detail {
         lines.extend(inner_circle);
 
         lines
+    }
+
+    pub fn update_chain(&mut self, segment_id: SegmentId) {
+        let points = segment_id.points(&mut self.points);
+        let length = segment_id.length(&mut self.lengths);
+        Self::resize_line(points.0, points.1, length);
+
+        let neighbours = segment_id.neighbours();
+        for neighbour in neighbours {
+            let points = neighbour.points(&mut self.points);
+            let length = neighbour.length(&mut self.lengths);
+            Self::update_line_length(points.0, points.1, length);
+        }
+    }
+
+    pub fn update_line_length(
+        p1: &mut Point2D, p2: &mut Point2D, length: &mut Centimeter,
+    ) {
+        *length = Centimeter(Line2D::with_transparent(*p1, *p2).length());
+    }
+
+    pub fn resize_line(start: &mut Point2D, end: &mut Point2D, length: &mut Centimeter) {
+        let initial_length = Line2D::with_transparent(*start, *end).length();
+        let unit_vector = Point2D {
+            x: end.x - start.x,
+            y: end.y - start.y,
+        };
+        let magnitude = Point2D {
+            x: unit_vector.x / initial_length,
+            y: unit_vector.y / initial_length,
+        };
+        let midpoint = {
+            let x = (start.x + end.x) / 2.0;
+            let y = (start.y + end.y) / 2.0;
+            Point2D { x, y }
+        };
+        let new_start = Point2D {
+            x: Centimeter(
+                midpoint.x.value() - (length.value() / 2.0) * magnitude.x.value(),
+            ),
+            y: Centimeter(
+                midpoint.y.value() - (length.value() / 2.0) * magnitude.y.value(),
+            ),
+        };
+        let new_end = Point2D {
+            x: Centimeter(
+                midpoint.x.value() + (length.value() / 2.0) * magnitude.x.value(),
+            ),
+            y: Centimeter(
+                midpoint.y.value() + (length.value() / 2.0) * magnitude.y.value(),
+            ),
+        };
+
+        *start = new_start;
+        *end = new_end;
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum SegmentId {
+    AB,
+    BC,
+    CD,
+    DE,
+    EF,
+    FG,
+    GH,
+    HI,
+    IJ,
+    JK,
+    KL,
+}
+
+impl SegmentId {
+    pub fn points<'a>(
+        &self, points: &'a mut DetailPoints,
+    ) -> (&'a mut Point2D, &'a mut Point2D) {
+        match self {
+            SegmentId::AB => (&mut points.a, &mut points.b),
+            SegmentId::BC => (&mut points.b, &mut points.c),
+            SegmentId::CD => (&mut points.c, &mut points.d),
+            SegmentId::DE => (&mut points.d, &mut points.e),
+            SegmentId::EF => (&mut points.e, &mut points.f),
+            SegmentId::FG => (&mut points.f, &mut points.g),
+            SegmentId::GH => (&mut points.g, &mut points.h),
+            SegmentId::HI => (&mut points.h, &mut points.i),
+            SegmentId::IJ => (&mut points.i, &mut points.j),
+            SegmentId::JK => (&mut points.j, &mut points.k),
+            SegmentId::KL => (&mut points.k, &mut points.l),
+        }
+    }
+
+    pub fn length<'a>(&self, lengths: &'a mut DetailSideLengths) -> &'a mut Centimeter {
+        match self {
+            SegmentId::AB => &mut lengths.ab,
+            SegmentId::BC => &mut lengths.bc,
+            SegmentId::CD => &mut lengths.cd,
+            SegmentId::DE => &mut lengths.de,
+            SegmentId::EF => &mut lengths.ef,
+            SegmentId::FG => &mut lengths.fg,
+            SegmentId::GH => &mut lengths.gh,
+            SegmentId::HI => &mut lengths.hi,
+            SegmentId::IJ => &mut lengths.ij,
+            SegmentId::JK => &mut lengths.jk,
+            SegmentId::KL => &mut lengths.kl,
+        }
+    }
+
+    pub fn neighbours(&self) -> Vec<SegmentId> {
+        match self {
+            SegmentId::AB => vec![SegmentId::BC],
+            SegmentId::BC => vec![SegmentId::AB, SegmentId::CD],
+            SegmentId::CD => vec![SegmentId::BC, SegmentId::DE],
+            SegmentId::DE => vec![SegmentId::CD, SegmentId::EF],
+            SegmentId::EF => vec![SegmentId::DE, SegmentId::FG],
+            SegmentId::FG => vec![SegmentId::EF, SegmentId::GH],
+            SegmentId::GH => vec![SegmentId::FG, SegmentId::HI],
+            SegmentId::HI => vec![SegmentId::GH, SegmentId::IJ],
+            SegmentId::IJ => vec![SegmentId::HI, SegmentId::JK],
+            SegmentId::JK => vec![SegmentId::IJ, SegmentId::KL],
+            SegmentId::KL => vec![SegmentId::JK],
+        }
+    }
+}
+
+impl Display for SegmentId {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let s = match self {
+            SegmentId::AB => "AB",
+            SegmentId::BC => "BC",
+            SegmentId::CD => "CD",
+            SegmentId::DE => "DE",
+            SegmentId::EF => "EF",
+            SegmentId::FG => "FG",
+            SegmentId::GH => "GH",
+            SegmentId::HI => "HI",
+            SegmentId::IJ => "IJ",
+            SegmentId::JK => "JK",
+            SegmentId::KL => "KL",
+        };
+        write!(f, "{}", s)
     }
 }
 

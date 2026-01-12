@@ -1,5 +1,6 @@
 use crate::context::Context;
-use egui::{DragValue, ScrollArea, SidePanel};
+use egui::{Color32, DragValue, Grid, RichText, ScrollArea, SidePanel};
+use geometry::figures::detail::SegmentId;
 use geometry::figures::grid;
 
 #[derive(Debug)]
@@ -76,7 +77,61 @@ impl SettingsComponent {
                             context.viewport.geometry.reset_offset();
                         }
                     });
+
+                    ui.separator();
+
+                    ui.vertical_centered_justified(|ui| {
+                        ui.label(RichText::new("Detail").color(Color32::WHITE));
+                    });
+
+                    ui.group(|ui| {
+                        ui.vertical_centered(|ui| {
+                            ui.label("Lengths");
+                        });
+
+                        Grid::new("Lengths_GRID").num_columns(4).show(ui, |ui| {
+                            Self::length_drag(ui, context, SegmentId::AB);
+                            Self::length_drag(ui, context, SegmentId::BC);
+                            ui.end_row();
+
+                            Self::length_drag(ui, context, SegmentId::CD);
+                            Self::length_drag(ui, context, SegmentId::DE);
+                            ui.end_row();
+
+                            Self::length_drag(ui, context, SegmentId::EF);
+                            Self::length_drag(ui, context, SegmentId::FG);
+                            ui.end_row();
+
+                            Self::length_drag(ui, context, SegmentId::GH);
+                            Self::length_drag(ui, context, SegmentId::HI);
+                            ui.end_row();
+
+                            Self::length_drag(ui, context, SegmentId::IJ);
+                            Self::length_drag(ui, context, SegmentId::JK);
+                            ui.end_row();
+
+                            Self::length_drag(ui, context, SegmentId::KL);
+                            ui.end_row();
+                        });
+                    });
                 });
             });
+    }
+
+    fn length_drag(ui: &mut egui::Ui, context: &mut Context, segment: SegmentId) {
+        let length = segment.length(&mut context.figures.detail.lengths);
+
+        ui.label(format!("{}:", segment));
+        if ui
+            .add(
+                DragValue::new(&mut length.0)
+                    .speed(0.1)
+                    .fixed_decimals(2)
+                    .range(0.1..=f32::INFINITY),
+            )
+            .changed()
+        {
+            context.figures.detail.update_chain(segment);
+        };
     }
 }
