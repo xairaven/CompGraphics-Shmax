@@ -3,7 +3,6 @@ use crate::primitives::line2d::Line2D;
 use crate::primitives::point2d::Point2D;
 use crate::units::Centimeter;
 use egui::Stroke;
-use std::fmt::{Display, Formatter};
 
 pub mod defaults {
     use egui::{Color32, Stroke};
@@ -103,6 +102,11 @@ impl Detail {
 
     pub fn resize_line(start: &mut Point2D, end: &mut Point2D, length: &mut Centimeter) {
         let initial_length = Line2D::with_transparent(*start, *end).length();
+
+        if initial_length < 1e-6 {
+            return;
+        }
+
         let unit_vector = Point2D {
             x: end.x - start.x,
             y: end.y - start.y,
@@ -188,39 +192,20 @@ impl SegmentId {
         }
     }
 
-    pub fn neighbours(&self) -> Vec<SegmentId> {
+    pub fn neighbours(&self) -> &'static [SegmentId] {
         match self {
-            SegmentId::AB => vec![SegmentId::BC],
-            SegmentId::BC => vec![SegmentId::AB, SegmentId::CD],
-            SegmentId::CD => vec![SegmentId::BC, SegmentId::DE],
-            SegmentId::DE => vec![SegmentId::CD, SegmentId::EF],
-            SegmentId::EF => vec![SegmentId::DE, SegmentId::FG],
-            SegmentId::FG => vec![SegmentId::EF, SegmentId::GH],
-            SegmentId::GH => vec![SegmentId::FG, SegmentId::HI],
-            SegmentId::HI => vec![SegmentId::GH, SegmentId::IJ],
-            SegmentId::IJ => vec![SegmentId::HI, SegmentId::JK],
-            SegmentId::JK => vec![SegmentId::IJ, SegmentId::KL],
-            SegmentId::KL => vec![SegmentId::JK],
+            SegmentId::AB => &[SegmentId::BC],
+            SegmentId::BC => &[SegmentId::AB, SegmentId::CD],
+            SegmentId::CD => &[SegmentId::BC, SegmentId::DE],
+            SegmentId::DE => &[SegmentId::CD, SegmentId::EF],
+            SegmentId::EF => &[SegmentId::DE, SegmentId::FG],
+            SegmentId::FG => &[SegmentId::EF, SegmentId::GH],
+            SegmentId::GH => &[SegmentId::FG, SegmentId::HI],
+            SegmentId::HI => &[SegmentId::GH, SegmentId::IJ],
+            SegmentId::IJ => &[SegmentId::HI, SegmentId::JK],
+            SegmentId::JK => &[SegmentId::IJ, SegmentId::KL],
+            SegmentId::KL => &[SegmentId::JK],
         }
-    }
-}
-
-impl Display for SegmentId {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        let s = match self {
-            SegmentId::AB => "AB",
-            SegmentId::BC => "BC",
-            SegmentId::CD => "CD",
-            SegmentId::DE => "DE",
-            SegmentId::EF => "EF",
-            SegmentId::FG => "FG",
-            SegmentId::GH => "GH",
-            SegmentId::HI => "HI",
-            SegmentId::IJ => "IJ",
-            SegmentId::JK => "JK",
-            SegmentId::KL => "KL",
-        };
-        write!(f, "{}", s)
     }
 }
 

@@ -121,7 +121,7 @@ impl SettingsComponent {
     fn length_drag(ui: &mut egui::Ui, context: &mut Context, segment: SegmentId) {
         let length = segment.length(&mut context.figures.detail.lengths);
 
-        ui.label(format!("{}:", segment));
+        ui.label(format!("{:#?}:", segment));
         if ui
             .add(
                 DragValue::new(&mut length.0)
