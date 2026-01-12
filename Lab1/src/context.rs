@@ -39,6 +39,12 @@ impl Default for Context {
     }
 }
 
+impl Context {
+    pub fn reset(&mut self) {
+        *self = Default::default();
+    }
+}
+
 #[derive(Debug)]
 pub struct FiguresState {
     pub grid: Grid2D,

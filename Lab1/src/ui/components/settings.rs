@@ -63,19 +63,25 @@ impl SettingsComponent {
                         });
                     });
 
-                    ui.horizontal(|ui| {
-                        ui.label("Pan:");
-                        ui.checkbox(&mut context.viewport.config.is_pannable, "");
-                    });
+                    Grid::new("AUXILIARY_SETTINGS")
+                        .num_columns(3)
+                        .show(ui, |ui| {
+                            ui.checkbox(&mut context.figures.grid.is_enabled, "Grid,");
+                            ui.checkbox(&mut context.viewport.config.is_pannable, "Pan,");
+                            ui.checkbox(&mut context.viewport.config.is_zoomable, "Zoom");
 
-                    ui.horizontal(|ui| {
-                        ui.label("Zoom:");
-                        ui.checkbox(&mut context.viewport.config.is_zoomable, "");
+                            ui.end_row();
+                        });
+
+                    ui.vertical_centered_justified(|ui| {
+                        if ui.button("Reset Pan").clicked() {
+                            context.viewport.geometry.reset_offset();
+                        }
                     });
 
                     ui.vertical_centered_justified(|ui| {
-                        if ui.button("Reset Offset").clicked() {
-                            context.viewport.geometry.reset_offset();
+                        if ui.button("Reset all to defaults").clicked() {
+                            context.reset();
                         }
                     });
 
