@@ -1,46 +1,59 @@
+use crate::pipeline::{Operation, Pipeline};
 use crate::primitives::line2d::Line2D;
 use crate::primitives::point2d::Point2D;
 use crate::units::Centimeter;
 
 #[derive(Debug, Default)]
-pub struct EuclideanOffset {
+pub struct EuclideanOffsetController {
     pub is_enabled: bool,
 
     pub x: Centimeter,
     pub y: Centimeter,
-
-    pub cache_x: Centimeter,
-    pub cache_y: Centimeter,
 }
 
-impl EuclideanOffset {
-    pub fn process_lines(&mut self, lines: &mut [Line2D<Point2D>]) {
-        if self.is_enabled {
-            self.cache_x += self.x;
-            self.cache_y += self.y;
-            self.is_enabled = false;
-            self.x = Centimeter(0.0);
-            self.y = Centimeter(0.0);
-        }
-
-        if self.cache_x.0 == 0.0 && self.cache_y.0 == 0.0 {
+impl EuclideanOffsetController {
+    pub fn handle(&mut self, operators: Vec<&mut Pipeline>) {
+        if !self.is_enabled {
             return;
         }
 
-        for line in lines.iter_mut() {
-            line.start.x += self.cache_x;
-            line.start.y += self.cache_y;
-
-            line.end.x += self.cache_x;
-            line.end.y += self.cache_y;
+        for pipeline in operators {
+            pipeline.add_operation(self.create_operation())
         }
+
+        self.reset();
     }
 
-    pub fn enable(&mut self) {
+    fn create_operation(&mut self) -> Operation {
+        Operation::Offset(OffsetOperation {
+            x: self.x,
+            y: self.y,
+        })
+    }
+
+    pub fn run(&mut self) {
         self.is_enabled = true;
     }
 
     pub fn reset(&mut self) {
         *self = Default::default();
+    }
+}
+
+#[derive(Debug)]
+pub struct OffsetOperation {
+    pub x: Centimeter,
+    pub y: Centimeter,
+}
+
+impl OffsetOperation {
+    pub fn go(&self, lines: &mut [Line2D<Point2D>]) {
+        for line in lines.iter_mut() {
+            line.start.x += self.x;
+            line.start.y += self.y;
+
+            line.end.x += self.x;
+            line.end.y += self.y;
+        }
     }
 }

@@ -1,4 +1,5 @@
 pub mod conversion;
+pub mod pipeline;
 pub mod units;
 pub mod viewport;
 pub mod figures {

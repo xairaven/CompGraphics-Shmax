@@ -2,7 +2,8 @@ use crate::ui::modals::error::ErrorModal;
 use crate::utils::channel::Channel;
 use geometry::figures::detail::Detail;
 use geometry::figures::grid::{Grid2D, Grid2DBuilder};
-use geometry::transformations::euclidean::offset::EuclideanOffset;
+use geometry::pipeline::Pipeline;
+use geometry::transformations::euclidean::offset::EuclideanOffsetController;
 use geometry::units::{Centimeter, Pixel};
 use geometry::viewport::{Viewport, ViewportGeometry, ViewportState, ZeroPointLocation};
 
@@ -48,7 +49,10 @@ impl Context {
 #[derive(Debug)]
 pub struct FiguresState {
     pub grid: Grid2D,
+    pub grid_pipeline: Pipeline,
+
     pub detail: Detail,
+    pub detail_pipeline: Pipeline,
 }
 
 impl Default for FiguresState {
@@ -59,12 +63,14 @@ impl Default for FiguresState {
                 .with_bounds_x(Some(Centimeter(0.0)), Some(Centimeter(120.0)))
                 .with_bounds_y(Some(Centimeter(0.0)), Some(Centimeter(120.0)))
                 .build(),
+            grid_pipeline: Default::default(),
             detail: Default::default(),
+            detail_pipeline: Default::default(),
         }
     }
 }
 
 #[derive(Debug, Default)]
 pub struct TransformContext {
-    pub offset: EuclideanOffset,
+    pub offset: EuclideanOffsetController,
 }

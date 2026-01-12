@@ -165,7 +165,6 @@ impl SettingsComponent {
                             ui.add(
                                 DragValue::new(&mut context.transformations.offset.x.0)
                                     .speed(0.1)
-                                    .range(0.0..=f32::INFINITY)
                                     .fixed_decimals(2),
                             );
 
@@ -173,7 +172,6 @@ impl SettingsComponent {
                             ui.add(
                                 DragValue::new(&mut context.transformations.offset.y.0)
                                     .speed(0.1)
-                                    .range(0.0..=f32::INFINITY)
                                     .fixed_decimals(2),
                             );
                         });
@@ -184,7 +182,7 @@ impl SettingsComponent {
                             ui.columns(2, |ui| {
                                 ui[0].vertical_centered_justified(|ui| {
                                     if ui.button("Apply").clicked() {
-                                        context.transformations.offset.enable();
+                                        context.transformations.offset.run();
                                     }
                                 });
                                 ui[1].vertical_centered_justified(|ui| {

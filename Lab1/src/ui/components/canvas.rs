@@ -31,7 +31,13 @@ impl CanvasComponent {
         lines.extend(grid);
 
         let mut detail = context.figures.detail.lines();
-        context.transformations.offset.process_lines(&mut detail);
+
+        context
+            .transformations
+            .offset
+            .handle(vec![&mut context.figures.detail_pipeline]);
+
+        context.figures.detail_pipeline.do_tasks(&mut detail);
         lines.extend(detail);
 
         lines
