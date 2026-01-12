@@ -1,10 +1,9 @@
-use crate::math::angle::Angle;
 use crate::metadata::dot::DotMetadata;
 use crate::metadata::shape::ShapeMetadata;
 use crate::units::{Centimeter, Pixel};
 use egui::epaint::CircleShape;
 use egui::{Pos2, Shape};
-use nalgebra::{Matrix3, SMatrix};
+use nalgebra::SMatrix;
 
 pub trait Pointable2D: Clone {
     fn x(&self) -> f64;
@@ -49,30 +48,6 @@ impl Point2D {
         Self {
             x: self.x * scale_factor,
             y: self.y * scale_factor,
-        }
-    }
-
-    pub fn rotate(self, angle: Angle, pivot: Point2D) -> Self {
-        let radian = angle.radian();
-
-        let vector = self.to_vector();
-        let matrix = Matrix3::new(
-            f64::cos(radian),
-            f64::sin(radian),
-            0.0,
-            -f64::sin(radian),
-            f64::cos(radian),
-            0.0,
-            (-pivot.x * (f64::cos(radian) - 1.0) + pivot.y * f64::sin(radian)).into(),
-            (-pivot.y * (f64::cos(radian) - 1.0) - pivot.x * f64::sin(radian)).into(),
-            1.0,
-        );
-
-        let result = vector * matrix;
-
-        Self {
-            x: Centimeter(result.x),
-            y: Centimeter(result.y),
         }
     }
 }

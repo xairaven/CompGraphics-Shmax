@@ -21,5 +21,6 @@ pub mod primitives {
 pub mod transformations {
     pub mod euclidean {
         pub mod offset;
+        pub mod rotation;
     }
 }

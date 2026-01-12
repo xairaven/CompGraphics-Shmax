@@ -36,6 +36,10 @@ impl CanvasComponent {
             .transformations
             .offset
             .handle(vec![&mut context.figures.detail_pipeline]);
+        context
+            .transformations
+            .rotation
+            .handle(vec![&mut context.figures.detail_pipeline]);
 
         context.figures.detail_pipeline.do_tasks(&mut detail);
         lines.extend(detail);
@@ -49,6 +53,11 @@ impl CanvasComponent {
     fn draw(ui: &mut egui::Ui, context: &mut Context, shapes: Vec<Shape>) -> Response {
         let (response, painter) = Self::initialize_painter(ui, context);
         painter.extend(shapes);
+
+        let rotation_dot = context.transformations.rotation.draw_dot(&context.viewport);
+        if let Some(dot) = rotation_dot {
+            painter.add(dot);
+        }
 
         response
     }

@@ -4,6 +4,7 @@ use geometry::figures::detail::Detail;
 use geometry::figures::grid::{Grid2D, Grid2DBuilder};
 use geometry::pipeline::Pipeline;
 use geometry::transformations::euclidean::offset::EuclideanOffsetController;
+use geometry::transformations::euclidean::rotation::EuclideanRotationController;
 use geometry::units::{Centimeter, Pixel};
 use geometry::viewport::{Viewport, ViewportGeometry, ViewportState, ZeroPointLocation};
 
@@ -73,4 +74,5 @@ impl Default for FiguresState {
 #[derive(Debug, Default)]
 pub struct TransformContext {
     pub offset: EuclideanOffsetController,
+    pub rotation: EuclideanRotationController,
 }

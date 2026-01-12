@@ -1,6 +1,7 @@
 use crate::primitives::line2d::Line2D;
 use crate::primitives::point2d::Point2D;
 use crate::transformations::euclidean::offset::OffsetOperation;
+use crate::transformations::euclidean::rotation::RotationOperation;
 
 #[derive(Debug, Default)]
 pub struct Pipeline {
@@ -22,12 +23,14 @@ impl Pipeline {
 #[derive(Debug)]
 pub enum Operation {
     Offset(OffsetOperation),
+    Rotation(RotationOperation),
 }
 
 impl Operation {
     pub fn go(&self, lines: &mut [Line2D<Point2D>]) {
         match self {
-            Self::Offset(offset) => offset.go(lines),
+            Self::Offset(operation) => operation.go(lines),
+            Self::Rotation(operation) => operation.go(lines),
         }
     }
 }

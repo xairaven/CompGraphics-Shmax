@@ -192,7 +192,68 @@ impl SettingsComponent {
                                 });
                             });
                         });
-                    })
+                    });
+
+                    ui.add_space(10.0);
+
+                    ui.group(|ui| {
+                        ui.vertical_centered(|ui| {
+                            ui.label("Rotation");
+                        });
+
+                        ui.add_space(5.0);
+
+                        Grid::new("EUCLIDEAN_Rotation")
+                            .num_columns(2)
+                            .show(ui, |ui| {
+                                ui.label("X:");
+                                ui.add(
+                                    DragValue::new(
+                                        &mut context.transformations.rotation.x.0,
+                                    )
+                                    .speed(0.1)
+                                    .fixed_decimals(2),
+                                );
+                                ui.end_row();
+
+                                ui.label("Y:");
+                                ui.add(
+                                    DragValue::new(
+                                        &mut context.transformations.rotation.y.0,
+                                    )
+                                    .speed(0.1)
+                                    .fixed_decimals(2),
+                                );
+                                ui.end_row();
+
+                                ui.label("Angle:");
+                                ui.add(
+                                    DragValue::new(
+                                        &mut context.transformations.rotation.angle,
+                                    )
+                                    .speed(1)
+                                    .suffix(" °"),
+                                );
+                                ui.end_row();
+                            });
+
+                        ui.add_space(5.0);
+
+                        ui.horizontal(|ui| {
+                            ui.columns(2, |ui| {
+                                ui[0].vertical_centered_justified(|ui| {
+                                    if ui.button("Apply").clicked() {
+                                        context.transformations.rotation.run();
+                                    }
+                                });
+                                ui[1].vertical_centered_justified(|ui| {
+                                    if ui.button("Reset").clicked() {
+                                        context.transformations.rotation.reset();
+                                    }
+                                });
+                            });
+                        });
+                    });
                 });
             });
     }
