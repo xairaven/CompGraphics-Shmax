@@ -38,6 +38,29 @@ impl Detail {
     pub fn lines(&self) -> Vec<Line2D<Point2D>> {
         let mut lines = vec![];
 
+        let points = vec![
+            &self.points.a,
+            &self.points.b,
+            &self.points.c,
+            &self.points.d,
+            &self.points.e,
+            &self.points.f,
+            &self.points.g,
+            &self.points.h,
+            &self.points.i,
+            &self.points.j,
+            &self.points.k,
+            &self.points.l,
+        ];
+        for window in points.windows(2) {
+            let line = Line2D {
+                start: *window[0],
+                end: *window[1],
+                stroke: self.stroke,
+            };
+            lines.push(line);
+        }
+
         let outer_circle = CircularShape {
             center: self.points.m,
             radius: self.radiuses.outer,
