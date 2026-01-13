@@ -446,7 +446,7 @@ impl SettingsComponent {
 
     fn projective(&self, ui: &mut egui::Ui, context: &mut Context) {
         ui.vertical_centered_justified(|ui| {
-            ui.label(RichText::new("Affine Transformations").color(Color32::WHITE));
+            ui.label(RichText::new("Projective Transformation").color(Color32::WHITE));
         });
 
         ui.add_space(5.0);

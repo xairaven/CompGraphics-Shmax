@@ -31,7 +31,11 @@ impl AffineScaling {
         }
     }
 
-    fn transform_point(&self, point: &mut Point2D) {
+    pub fn transform_point(&self, point: &mut Point2D) {
+        if !self.is_enabled {
+            return;
+        }
+
         point.x *= self.mx;
         point.y *= self.my;
     }

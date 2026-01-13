@@ -30,23 +30,23 @@ impl EuclideanRotation {
         self.reset();
     }
 
-    pub fn draw_dot(&self, viewport: &Viewport) -> Option<Shape> {
+    pub fn leading_point(&self) -> Option<Point2D> {
         if self.x.0 == 0.0 && self.y.0 == 0.0 {
             return None;
         }
 
-        let point = Point2D {
+        Some(Point2D {
             x: self.x,
             y: self.y,
-        }
-        .to_pixels(viewport)
-        .to_dot(&DotMetadata {
+        })
+    }
+
+    pub fn leading_shape(point: Point2D, viewport: &Viewport) -> Shape {
+        point.to_pixels(viewport).to_dot(&DotMetadata {
             radius: 5.0,
             fill: Color32::RED,
             stroke: Stroke::new(0.5, Color32::BLACK),
-        });
-
-        Some(point)
+        })
     }
 
     fn create_operation(&mut self) -> Operation {

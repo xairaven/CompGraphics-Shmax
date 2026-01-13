@@ -39,16 +39,14 @@ impl Affine {
             return;
         }
 
-        let matrix = self.matrix();
         for line in lines.iter_mut() {
-            self.transform_point(&mut line.start, &matrix);
-            self.transform_point(&mut line.end, &matrix);
+            self.transform_point(&mut line.start);
+            self.transform_point(&mut line.end);
         }
     }
-
-    fn transform_point(&self, point: &mut Point2D, matrix: &Matrix3<f64>) {
+    pub fn transform_point(&self, point: &mut Point2D) {
         let vector = point.to_vector();
-        let result = vector * matrix;
+        let result = vector * self.matrix();
 
         *point = Point2D {
             x: Centimeter(result.x),

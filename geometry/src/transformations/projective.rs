@@ -47,7 +47,11 @@ impl Projective {
         }
     }
 
-    fn transform_point(&self, point: &mut Point2D) {
+    pub fn transform_point(&self, point: &mut Point2D) {
+        if !self.is_enabled {
+            return;
+        }
+
         *point = Point2D {
             x: Centimeter(
                 (self.zero_x * self.w_zero

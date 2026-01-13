@@ -2,6 +2,8 @@ use crate::context::Context;
 use egui::{CentralPanel, Color32, Frame, Painter, Response, Sense, Shape};
 use geometry::primitives::line2d::Line2D;
 use geometry::primitives::point2d::Point2D;
+use geometry::transformations::affine::symmetry::AffinePointSymmetry;
+use geometry::transformations::euclidean::rotation::EuclideanRotation;
 
 #[derive(Debug, Default)]
 pub struct CanvasComponent;
@@ -48,34 +50,39 @@ impl CanvasComponent {
 
         context.figures.detail_pipeline.do_tasks(&mut detail);
 
+        let rotation_point = context.transformations.rotation.leading_point();
+        let symmetry_point = context.transformations.symmetry.leading_point();
+
         // Other transformations that applied, but not saved
-        context.transformations.affine.handle(&mut grid);
-        context.transformations.affine.handle(&mut detail);
-        context.transformations.scale.handle(&mut grid);
-        context.transformations.scale.handle(&mut detail);
-        context.transformations.projective.handle(&mut grid);
-        context.transformations.projective.handle(&mut detail);
+        Self::global_transform_lines(&mut detail, context);
+        Self::global_transform_lines(&mut grid, context);
 
         // Conversion to shapes
         lines.extend(grid);
         lines.extend(detail);
 
-        lines
+        let mut shapes = lines
             .iter()
             .map(|line| line.to_pixels(&context.viewport).to_shape())
-            .collect()
+            .collect::<Vec<Shape>>();
+
+        // Rotation point
+        if let Some(mut dot) = rotation_point {
+            Self::global_transform_point(&mut dot, context);
+            shapes.push(EuclideanRotation::leading_shape(dot, &context.viewport));
+        }
+        // Symmetry point
+        if let Some(mut dot) = symmetry_point {
+            Self::global_transform_point(&mut dot, context);
+            shapes.push(AffinePointSymmetry::leading_shape(dot, &context.viewport));
+        }
+
+        shapes
     }
 
     fn draw(ui: &mut egui::Ui, context: &mut Context, shapes: Vec<Shape>) -> Response {
         let (response, painter) = Self::initialize_painter(ui, context);
         painter.extend(shapes);
-
-        if let Some(dot) = context.transformations.rotation.draw_dot(&context.viewport) {
-            painter.add(dot);
-        }
-        if let Some(dot) = context.transformations.symmetry.draw_dot(&context.viewport) {
-            painter.add(dot);
-        }
 
         response
     }
@@ -90,5 +97,17 @@ impl CanvasComponent {
         context.viewport.update_state(&response);
 
         (response, painter)
+    }
+
+    fn global_transform_lines(lines: &mut [Line2D<Point2D>], context: &mut Context) {
+        context.transformations.affine.handle(lines);
+        context.transformations.scale.handle(lines);
+        context.transformations.projective.handle(lines);
+    }
+
+    fn global_transform_point(point: &mut Point2D, context: &mut Context) {
+        context.transformations.affine.transform_point(point);
+        context.transformations.scale.transform_point(point);
+        context.transformations.projective.transform_point(point);
     }
 }
