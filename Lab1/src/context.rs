@@ -5,6 +5,7 @@ use geometry::figures::grid::{Grid2D, Grid2DBuilder};
 use geometry::pipeline::Pipeline;
 use geometry::transformations::affine::Affine;
 use geometry::transformations::affine::scaling::AffineScaling;
+use geometry::transformations::affine::symmetry::AffinePointSymmetry;
 use geometry::transformations::euclidean::offset::EuclideanOffset;
 use geometry::transformations::euclidean::rotation::EuclideanRotation;
 use geometry::units::{Centimeter, Pixel};
@@ -84,4 +85,5 @@ pub struct TransformContext {
     pub rotation: EuclideanRotation,
     pub affine: Affine,
     pub scale: AffineScaling,
+    pub symmetry: AffinePointSymmetry,
 }

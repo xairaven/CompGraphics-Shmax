@@ -390,5 +390,51 @@ impl SettingsComponent {
                 }
             });
         });
+
+        ui.add_space(10.0);
+
+        ui.group(|ui| {
+            ui.vertical_centered(|ui| {
+                ui.label("Point Symmetry");
+            });
+
+            ui.add_space(5.0);
+
+            Grid::new("AFFINE_Point_Symmetry")
+                .num_columns(4)
+                .show(ui, |ui| {
+                    ui.label("X:");
+                    ui.add(
+                        DragValue::new(&mut context.transformations.symmetry.x.0)
+                            .speed(0.1)
+                            .fixed_decimals(2),
+                    );
+
+                    ui.label("Y:");
+                    ui.add(
+                        DragValue::new(&mut context.transformations.symmetry.y.0)
+                            .speed(0.1)
+                            .fixed_decimals(2),
+                    );
+                    ui.end_row();
+                });
+
+            ui.add_space(5.0);
+
+            ui.horizontal(|ui| {
+                ui.columns(2, |ui| {
+                    ui[0].vertical_centered_justified(|ui| {
+                        if ui.button("Apply").clicked() {
+                            context.transformations.symmetry.run();
+                        }
+                    });
+                    ui[1].vertical_centered_justified(|ui| {
+                        if ui.button("Reset").clicked() {
+                            context.transformations.symmetry.reset();
+                        }
+                    });
+                });
+            });
+        });
     }
 }

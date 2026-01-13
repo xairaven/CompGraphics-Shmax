@@ -4,6 +4,7 @@ use crate::units::Centimeter;
 use nalgebra::Matrix3;
 
 pub mod scaling;
+pub mod symmetry;
 
 #[derive(Debug)]
 pub struct Affine {

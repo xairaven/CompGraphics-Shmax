@@ -1,5 +1,6 @@
 use crate::primitives::line2d::Line2D;
 use crate::primitives::point2d::Point2D;
+use crate::transformations::affine::symmetry::PointSymmetryOperation;
 use crate::transformations::euclidean::offset::OffsetOperation;
 use crate::transformations::euclidean::rotation::RotationOperation;
 
@@ -24,6 +25,7 @@ impl Pipeline {
 pub enum Operation {
     Offset(OffsetOperation),
     Rotation(RotationOperation),
+    PointSymmetry(PointSymmetryOperation),
 }
 
 impl Operation {
@@ -31,6 +33,7 @@ impl Operation {
         match self {
             Self::Offset(operation) => operation.go(lines),
             Self::Rotation(operation) => operation.go(lines),
+            Self::PointSymmetry(operation) => operation.go(lines),
         }
     }
 }

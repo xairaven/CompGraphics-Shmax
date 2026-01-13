@@ -41,6 +41,10 @@ impl CanvasComponent {
             .transformations
             .rotation
             .handle(vec![&mut context.figures.detail_pipeline]);
+        context
+            .transformations
+            .symmetry
+            .handle(vec![&mut context.figures.detail_pipeline]);
 
         context.figures.detail_pipeline.do_tasks(&mut detail);
 
@@ -64,8 +68,10 @@ impl CanvasComponent {
         let (response, painter) = Self::initialize_painter(ui, context);
         painter.extend(shapes);
 
-        let rotation_dot = context.transformations.rotation.draw_dot(&context.viewport);
-        if let Some(dot) = rotation_dot {
+        if let Some(dot) = context.transformations.rotation.draw_dot(&context.viewport) {
+            painter.add(dot);
+        }
+        if let Some(dot) = context.transformations.symmetry.draw_dot(&context.viewport) {
             painter.add(dot);
         }
 
