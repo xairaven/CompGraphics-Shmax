@@ -23,4 +23,5 @@ pub mod transformations {
         pub mod offset;
         pub mod rotation;
     }
+    pub mod affine;
 }

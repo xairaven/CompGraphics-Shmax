@@ -4,14 +4,14 @@ use crate::primitives::point2d::Point2D;
 use crate::units::Centimeter;
 
 #[derive(Debug, Default)]
-pub struct EuclideanOffsetController {
+pub struct EuclideanOffset {
     pub is_enabled: bool,
 
     pub x: Centimeter,
     pub y: Centimeter,
 }
 
-impl EuclideanOffsetController {
+impl EuclideanOffset {
     pub fn handle(&mut self, operators: Vec<&mut Pipeline>) {
         if !self.is_enabled {
             return;

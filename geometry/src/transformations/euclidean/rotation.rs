@@ -9,7 +9,7 @@ use egui::{Color32, Shape, Stroke};
 use nalgebra::Matrix3;
 
 #[derive(Debug, Default)]
-pub struct EuclideanRotationController {
+pub struct EuclideanRotation {
     pub is_enabled: bool,
 
     pub x: Centimeter,
@@ -17,7 +17,7 @@ pub struct EuclideanRotationController {
     pub angle: f64,
 }
 
-impl EuclideanRotationController {
+impl EuclideanRotation {
     pub fn handle(&mut self, operators: Vec<&mut Pipeline>) {
         if !self.is_enabled {
             return;

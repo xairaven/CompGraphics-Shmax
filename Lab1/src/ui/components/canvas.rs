@@ -27,8 +27,8 @@ impl CanvasComponent {
     fn create_shapes(_ui: &mut egui::Ui, context: &mut Context) -> Vec<Shape> {
         let mut lines = vec![];
 
-        let grid: Vec<Line2D<Point2D>> = context.figures.grid.lines(&context.viewport);
-        lines.extend(grid);
+        let mut grid: Vec<Line2D<Point2D>> =
+            context.figures.grid.lines(&context.viewport);
 
         let mut detail = context.figures.detail.lines();
 
@@ -42,6 +42,13 @@ impl CanvasComponent {
             .handle(vec![&mut context.figures.detail_pipeline]);
 
         context.figures.detail_pipeline.do_tasks(&mut detail);
+
+        // Other transformations that applied, but not saved
+        context.transformations.affine.handle(&mut grid);
+        context.transformations.affine.handle(&mut detail);
+
+        // Conversion to shapes
+        lines.extend(grid);
         lines.extend(detail);
 
         lines

@@ -3,8 +3,9 @@ use crate::utils::channel::Channel;
 use geometry::figures::detail::Detail;
 use geometry::figures::grid::{Grid2D, Grid2DBuilder};
 use geometry::pipeline::Pipeline;
-use geometry::transformations::euclidean::offset::EuclideanOffsetController;
-use geometry::transformations::euclidean::rotation::EuclideanRotationController;
+use geometry::transformations::affine::Affine;
+use geometry::transformations::euclidean::offset::EuclideanOffset;
+use geometry::transformations::euclidean::rotation::EuclideanRotation;
 use geometry::units::{Centimeter, Pixel};
 use geometry::viewport::{Viewport, ViewportGeometry, ViewportState, ZeroPointLocation};
 
@@ -73,6 +74,7 @@ impl Default for FiguresState {
 
 #[derive(Debug, Default)]
 pub struct TransformContext {
-    pub offset: EuclideanOffsetController,
-    pub rotation: EuclideanRotationController,
+    pub offset: EuclideanOffset,
+    pub rotation: EuclideanRotation,
+    pub affine: Affine,
 }
