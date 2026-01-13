@@ -46,6 +46,10 @@ impl Context {
     pub fn reset(&mut self) {
         *self = Default::default();
     }
+
+    pub fn fixating_grid(&mut self) {
+        self.viewport.geometry.fixed_grid = self.transformations.affine.is_enabled;
+    }
 }
 
 #[derive(Debug)]

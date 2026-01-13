@@ -20,6 +20,7 @@ impl CanvasComponent {
     }
 
     fn pipeline(ui: &mut egui::Ui, context: &mut Context) -> Response {
+        context.fixating_grid();
         let shapes = Self::create_shapes(ui, context);
         Self::draw(ui, context, shapes)
     }

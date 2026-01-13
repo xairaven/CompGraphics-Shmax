@@ -68,6 +68,8 @@ pub struct ViewportGeometry {
     pub zero_point_location: ZeroPointLocation,
     pub pixels_per_centimeter: f64,
     pub offset: Point2DPixel,
+    // Used with affine transformations to keep the grid fixed, etc.
+    pub fixed_grid: bool,
 }
 
 impl Default for ViewportGeometry {
@@ -79,6 +81,7 @@ impl Default for ViewportGeometry {
                 x: Pixel(0.0),
                 y: Pixel(0.0),
             },
+            fixed_grid: false,
         }
     }
 }

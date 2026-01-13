@@ -118,6 +118,16 @@ impl GridBounds {
         // Canvas bounds in centimeters
         let v = viewport.state.bounds.to_centimeters(viewport);
 
+        // Fix for affine and etc. transformations
+        if viewport.geometry.fixed_grid {
+            return ViewGridBounds {
+                minimum_x: self.x.0.unwrap_or(Centimeter(-100.0)),
+                maximum_x: self.x.1.unwrap_or(Centimeter(100.0)),
+                minimum_y: self.y.0.unwrap_or(Centimeter(-100.0)),
+                maximum_y: self.x.1.unwrap_or(Centimeter(100.0)),
+            };
+        }
+
         ViewGridBounds {
             minimum_x: self
                 .x
