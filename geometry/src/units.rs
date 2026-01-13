@@ -1,9 +1,12 @@
-use derive_more::{Add, AddAssign, Display, Div, From, Into, Mul, Neg, Rem, Sub};
+use derive_more::{
+    Add, AddAssign, Display, Div, From, Into, Mul, MulAssign, Neg, Rem, Sub,
+};
 use std::ops::{Deref, DerefMut};
 
 #[derive(
     Add,
     AddAssign,
+    MulAssign,
     Sub,
     Mul,
     Div,
