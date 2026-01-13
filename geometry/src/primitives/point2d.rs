@@ -1,9 +1,9 @@
-use crate::metadata::dot::DotMetadata;
-use crate::metadata::shape::ShapeMetadata;
 use crate::units::{Centimeter, Pixel};
 use egui::epaint::CircleShape;
 use egui::{Pos2, Shape};
 use nalgebra::SMatrix;
+use crate::shapes::dot::DotMetadata;
+use crate::shapes::shape::ShapeMetadata;
 
 pub trait Pointable2D: Clone {
     fn x(&self) -> f64;

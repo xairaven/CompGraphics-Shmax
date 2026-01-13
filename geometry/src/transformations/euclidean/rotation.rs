@@ -1,5 +1,4 @@
 use crate::math::angle::Angle;
-use crate::metadata::dot::DotMetadata;
 use crate::pipeline::{Operation, Pipeline};
 use crate::primitives::line2d::Line2D;
 use crate::primitives::point2d::Point2D;
@@ -7,6 +6,7 @@ use crate::units::Centimeter;
 use crate::viewport::Viewport;
 use egui::{Color32, Shape, Stroke};
 use nalgebra::Matrix3;
+use crate::shapes::dot::DotMetadata;
 
 #[derive(Debug, Default)]
 pub struct EuclideanRotation {
