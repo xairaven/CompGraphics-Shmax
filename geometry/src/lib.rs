@@ -24,4 +24,5 @@ pub mod transformations {
         pub mod rotation;
     }
     pub mod affine;
+    pub mod projective;
 }

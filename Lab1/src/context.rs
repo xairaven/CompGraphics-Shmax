@@ -8,6 +8,7 @@ use geometry::transformations::affine::scaling::AffineScaling;
 use geometry::transformations::affine::symmetry::AffinePointSymmetry;
 use geometry::transformations::euclidean::offset::EuclideanOffset;
 use geometry::transformations::euclidean::rotation::EuclideanRotation;
+use geometry::transformations::projective::Projective;
 use geometry::units::{Centimeter, Pixel};
 use geometry::viewport::{Viewport, ViewportGeometry, ViewportState, ZeroPointLocation};
 
@@ -51,7 +52,8 @@ impl Context {
 
     pub fn fixating_grid(&mut self) {
         self.viewport.geometry.fixed_grid = self.transformations.affine.is_enabled
-            || self.transformations.scale.is_enabled;
+            || self.transformations.scale.is_enabled
+            || self.transformations.projective.is_enabled;
     }
 }
 
@@ -86,4 +88,5 @@ pub struct TransformContext {
     pub affine: Affine,
     pub scale: AffineScaling,
     pub symmetry: AffinePointSymmetry,
+    pub projective: Projective,
 }

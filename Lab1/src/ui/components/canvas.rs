@@ -53,6 +53,8 @@ impl CanvasComponent {
         context.transformations.affine.handle(&mut detail);
         context.transformations.scale.handle(&mut grid);
         context.transformations.scale.handle(&mut detail);
+        context.transformations.projective.handle(&mut grid);
+        context.transformations.projective.handle(&mut detail);
 
         // Conversion to shapes
         lines.extend(grid);

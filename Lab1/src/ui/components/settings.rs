@@ -100,6 +100,12 @@ impl SettingsComponent {
                     ui.add_space(10.0);
 
                     self.affine(ui, context);
+
+                    ui.add_space(10.0);
+                    ui.separator();
+                    ui.add_space(10.0);
+
+                    self.projective(ui, context);
                 });
             });
     }
@@ -434,6 +440,101 @@ impl SettingsComponent {
                         }
                     });
                 });
+            });
+        });
+    }
+
+    fn projective(&self, ui: &mut egui::Ui, context: &mut Context) {
+        ui.vertical_centered_justified(|ui| {
+            ui.label(RichText::new("Affine Transformations").color(Color32::WHITE));
+        });
+
+        ui.add_space(5.0);
+
+        ui.group(|ui| {
+            ui.checkbox(
+                &mut context.transformations.projective.is_enabled,
+                "Enabled",
+            );
+
+            Grid::new("PROJECTIVE").num_columns(2).show(ui, |ui| {
+                ui.label("Xx:");
+                ui.add(
+                    DragValue::new(&mut context.transformations.projective.xx)
+                        .speed(0.1)
+                        .fixed_decimals(2),
+                );
+                ui.end_row();
+
+                ui.label("Xy:");
+                ui.add(
+                    DragValue::new(&mut context.transformations.projective.xy)
+                        .speed(0.1)
+                        .fixed_decimals(2),
+                );
+                ui.end_row();
+
+                ui.label("Wx:");
+                ui.add(
+                    DragValue::new(&mut context.transformations.projective.wx)
+                        .speed(0.1)
+                        .fixed_decimals(2),
+                );
+                ui.end_row();
+
+                ui.label("Yx:");
+                ui.add(
+                    DragValue::new(&mut context.transformations.projective.yx)
+                        .speed(0.1)
+                        .fixed_decimals(2),
+                );
+                ui.end_row();
+
+                ui.label("Yy:");
+                ui.add(
+                    DragValue::new(&mut context.transformations.projective.yy)
+                        .speed(0.1)
+                        .fixed_decimals(2),
+                );
+                ui.end_row();
+
+                ui.label("Wy:");
+                ui.add(
+                    DragValue::new(&mut context.transformations.projective.wy)
+                        .speed(0.1)
+                        .fixed_decimals(2),
+                );
+                ui.end_row();
+
+                ui.label("0x:");
+                ui.add(
+                    DragValue::new(&mut context.transformations.projective.zero_x)
+                        .speed(0.1)
+                        .fixed_decimals(2),
+                );
+                ui.end_row();
+
+                ui.label("0y:");
+                ui.add(
+                    DragValue::new(&mut context.transformations.projective.zero_y)
+                        .speed(0.1)
+                        .fixed_decimals(2),
+                );
+                ui.end_row();
+
+                ui.label("W0:");
+                ui.add(
+                    DragValue::new(&mut context.transformations.projective.w_zero)
+                        .speed(0.1)
+                        .fixed_decimals(2),
+                );
+                ui.end_row();
+            });
+
+            ui.vertical_centered_justified(|ui| {
+                if ui.button("Reset").clicked() {
+                    context.transformations.projective.reset();
+                }
             });
         });
     }
