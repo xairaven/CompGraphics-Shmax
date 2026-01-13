@@ -3,6 +3,8 @@ use crate::primitives::point2d::Point2D;
 use crate::units::Centimeter;
 use nalgebra::Matrix3;
 
+pub mod scaling;
+
 #[derive(Debug)]
 pub struct Affine {
     pub is_enabled: bool,

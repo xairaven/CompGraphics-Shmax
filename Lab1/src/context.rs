@@ -4,6 +4,7 @@ use geometry::figures::detail::Detail;
 use geometry::figures::grid::{Grid2D, Grid2DBuilder};
 use geometry::pipeline::Pipeline;
 use geometry::transformations::affine::Affine;
+use geometry::transformations::affine::scaling::AffineScaling;
 use geometry::transformations::euclidean::offset::EuclideanOffset;
 use geometry::transformations::euclidean::rotation::EuclideanRotation;
 use geometry::units::{Centimeter, Pixel};
@@ -48,7 +49,8 @@ impl Context {
     }
 
     pub fn fixating_grid(&mut self) {
-        self.viewport.geometry.fixed_grid = self.transformations.affine.is_enabled;
+        self.viewport.geometry.fixed_grid = self.transformations.affine.is_enabled
+            || self.transformations.scale.is_enabled;
     }
 }
 
@@ -81,4 +83,5 @@ pub struct TransformContext {
     pub offset: EuclideanOffset,
     pub rotation: EuclideanRotation,
     pub affine: Affine,
+    pub scale: AffineScaling,
 }

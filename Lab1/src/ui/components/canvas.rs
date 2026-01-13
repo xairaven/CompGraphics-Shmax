@@ -47,6 +47,8 @@ impl CanvasComponent {
         // Other transformations that applied, but not saved
         context.transformations.affine.handle(&mut grid);
         context.transformations.affine.handle(&mut detail);
+        context.transformations.scale.handle(&mut grid);
+        context.transformations.scale.handle(&mut detail);
 
         // Conversion to shapes
         lines.extend(grid);
