@@ -86,7 +86,65 @@ impl SettingsComponent {
                     ui.add_space(10.0);
                     ui.separator();
                     ui.add_space(10.0);
+
+                    self.epicycloid(ui, context);
                 });
             });
+    }
+
+    fn epicycloid(&self, ui: &mut egui::Ui, context: &mut Context) {
+        ui.vertical_centered_justified(|ui| {
+            ui.label(RichText::new("Epicycloid Settings").color(Color32::WHITE));
+        });
+
+        Grid::new("EPICYCLOID_SETTINGS")
+            .num_columns(2)
+            .show(ui, |ui| {
+                ui.label("Fixed Radius:");
+                ui.add(
+                    DragValue::new(&mut context.figures.epicycloid.fixed_radius.0)
+                        .speed(1)
+                        .range(0.0..=f64::INFINITY),
+                );
+                ui.end_row();
+
+                ui.label("Rolling Radius:");
+                ui.add(
+                    DragValue::new(&mut context.figures.epicycloid.rolling_radius.0)
+                        .speed(1)
+                        .range(0.0..=f64::INFINITY),
+                );
+                ui.end_row();
+
+                ui.label("Pen Offset:");
+                ui.add(
+                    DragValue::new(&mut context.figures.epicycloid.pen_offset.0)
+                        .speed(1)
+                        .range(0.0..=f64::INFINITY),
+                );
+                ui.end_row();
+
+                ui.label("Rotations:");
+                ui.add(
+                    DragValue::new(&mut context.figures.epicycloid.rotations)
+                        .speed(1)
+                        .range(1..=u32::MAX),
+                );
+                ui.end_row();
+
+                ui.label("Step:");
+                ui.add(
+                    DragValue::new(&mut context.figures.epicycloid.step)
+                        .speed(0.05)
+                        .range(0.05..=f64::INFINITY),
+                );
+                ui.end_row();
+            });
+
+        ui.vertical_centered_justified(|ui| {
+            if ui.button("Reset").clicked() {
+                context.figures.epicycloid.reset();
+            }
+        });
     }
 }

@@ -29,8 +29,11 @@ impl CanvasComponent {
 
         let grid: Vec<Line2D<Point2D>> = context.figures.grid.lines(&context.viewport);
 
+        let epicycloid = context.figures.epicycloid.lines();
+
         // Conversion to shapes
         lines.extend(grid);
+        lines.extend(epicycloid);
 
         lines
             .iter()

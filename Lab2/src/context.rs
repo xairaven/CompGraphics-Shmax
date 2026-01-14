@@ -1,6 +1,6 @@
 use crate::ui::modals::error::ErrorModal;
 use crate::utils::channel::Channel;
-use geometry::figures::detail::Detail;
+use geometry::figures::epicycloid::Epicycloid;
 use geometry::figures::grid::{Grid2D, Grid2DBuilder};
 use geometry::pipeline::Pipeline;
 use geometry::transformations::euclidean::offset::EuclideanOffset;
@@ -50,17 +50,17 @@ pub struct FiguresState {
     pub grid: Grid2D,
     pub grid_pipeline: Pipeline,
 
-    pub detail: Detail,
-    pub detail_pipeline: Pipeline,
+    pub epicycloid: Epicycloid,
+    pub epicycloid_pipeline: Pipeline,
 }
 
 impl Default for FiguresState {
     fn default() -> Self {
         Self {
-            grid: Grid2DBuilder::default().with_unit(Centimeter(1.0)).build(),
+            grid: Grid2DBuilder::default().with_unit(Centimeter(5.0)).build(),
             grid_pipeline: Default::default(),
-            detail: Default::default(),
-            detail_pipeline: Default::default(),
+            epicycloid: Default::default(),
+            epicycloid_pipeline: Default::default(),
         }
     }
 }
