@@ -28,11 +28,8 @@ impl CanvasComponent {
     fn create_shapes(_ui: &mut egui::Ui, context: &mut Context) -> Vec<Shape> {
         let mut lines = vec![];
 
-        let epicycloid = &mut context.figures.epicycloid;
-        context.animations.epicycloid.run(epicycloid);
-
         let grid: Vec<Line2D<Point2D>> = context.figures.grid.lines(&context.viewport);
-        let mut epicycloid = epicycloid.lines();
+        let mut epicycloid = context.figures.epicycloid.lines();
 
         context
             .transformations
@@ -68,6 +65,10 @@ impl CanvasComponent {
     fn draw(ui: &mut egui::Ui, context: &mut Context, shapes: Vec<Shape>) -> Response {
         let (response, painter) = Self::initialize_painter(ui, context);
         painter.extend(shapes);
+
+        // Animation
+        let epicycloid = &mut context.figures.epicycloid;
+        context.animations.epicycloid.run(ui, epicycloid);
 
         response
     }

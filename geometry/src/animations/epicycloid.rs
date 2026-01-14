@@ -1,3 +1,4 @@
+use crate::animations::Direction;
 use crate::figures::epicycloid::Epicycloid;
 use std::ops::RangeInclusive;
 
@@ -19,11 +20,12 @@ impl Default for AnimationEpicycloid {
 }
 
 impl AnimationEpicycloid {
-    pub fn run(&mut self, model: &mut Epicycloid) {
+    pub fn run(&mut self, ui: &mut egui::Ui, model: &mut Epicycloid) {
         let field = &mut model.pen_offset.0;
 
         if self.is_enabled {
             self.step(field);
+            ui.ctx().request_repaint();
         }
     }
 
@@ -47,25 +49,3 @@ impl AnimationEpicycloid {
 
 const STEP_SIZE: f64 = 0.5;
 const RANGE: RangeInclusive<f64> = 1.0..=100.0;
-
-#[derive(Debug)]
-pub enum Direction {
-    Increase,
-    Decrease,
-}
-
-impl Direction {
-    pub fn factor(&self) -> f64 {
-        match self {
-            Self::Increase => 1.0,
-            Self::Decrease => -1.0,
-        }
-    }
-
-    pub fn toggle(&mut self) {
-        *self = match self {
-            Self::Increase => Self::Decrease,
-            Self::Decrease => Self::Increase,
-        };
-    }
-}
