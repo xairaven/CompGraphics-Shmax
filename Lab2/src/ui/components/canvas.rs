@@ -25,11 +25,13 @@ impl CanvasComponent {
         Self::draw(ui, context, shapes)
     }
 
-    fn create_shapes(_ui: &mut egui::Ui, context: &mut Context) -> Vec<Shape> {
+    fn create_shapes(ui: &mut egui::Ui, context: &mut Context) -> Vec<Shape> {
         let mut lines = vec![];
 
         let grid: Vec<Line2D<Point2D>> = context.figures.grid.lines(&context.viewport);
         let mut epicycloid = context.figures.epicycloid.lines();
+
+        context.animations.walker.step(ui, &mut epicycloid);
 
         context
             .transformations
@@ -57,6 +59,10 @@ impl CanvasComponent {
         // Rotation point
         if let Some(dot) = context.transformations.rotation.leading_point() {
             shapes.push(EuclideanRotation::leading_shape(dot, &context.viewport));
+        }
+        // Walker point
+        if let Some(dot) = context.animations.walker.dot(&context.viewport) {
+            shapes.push(dot);
         }
 
         shapes

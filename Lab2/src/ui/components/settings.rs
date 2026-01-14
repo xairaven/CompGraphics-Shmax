@@ -1,5 +1,6 @@
 use crate::context::Context;
 use egui::{Color32, DragValue, Grid, RichText, ScrollArea, SidePanel};
+use geometry::animations::walker;
 use geometry::figures::grid;
 
 #[derive(Debug)]
@@ -94,6 +95,12 @@ impl SettingsComponent {
                     ui.add_space(10.0);
 
                     self.animation(ui, context);
+
+                    ui.add_space(10.0);
+                    ui.separator();
+                    ui.add_space(10.0);
+
+                    self.curve_walk(ui, context);
 
                     ui.add_space(10.0);
                     ui.separator();
@@ -291,6 +298,64 @@ impl SettingsComponent {
                 if ui.button(text).clicked() {
                     context.animations.epicycloid.toggle();
                 }
+            });
+        });
+    }
+
+    fn curve_walk(&self, ui: &mut egui::Ui, context: &mut Context) {
+        ui.vertical_centered_justified(|ui| {
+            ui.label(RichText::new("Curve Walk").color(Color32::WHITE));
+        });
+
+        ui.add_space(5.0);
+
+        ui.group(|ui| {
+            Grid::new("CurvePointGrid").num_columns(3).show(ui, |ui| {
+                ui.label("Status: ");
+
+                if context.animations.walker.is_visible {
+                    ui.label(RichText::new("Visible").color(Color32::LIGHT_GREEN));
+                } else {
+                    ui.label(RichText::new("Hidden").color(Color32::RED));
+                };
+
+                if context.animations.walker.is_enabled {
+                    ui.label(RichText::new("Running").color(Color32::LIGHT_GREEN));
+                } else {
+                    ui.label(RichText::new("Stopped").color(Color32::RED));
+                };
+
+                ui.end_row();
+
+                if ui.button("Show / Hide").clicked() {
+                    context.animations.walker.show_toggle();
+                }
+
+                if ui.button("⏪").clicked() {
+                    context.animations.walker.set_decreasing();
+                }
+                if ui.button("⏩").clicked() {
+                    context.animations.walker.set_increasing();
+                }
+
+                ui.end_row();
+
+                if context.animations.walker.is_visible {
+                    let point = context.animations.walker.point();
+                    ui.label("Coordinates: ");
+                    ui.label(format!("X: {:.2}", point.x));
+                    ui.label(format!("Y: {:.2}", point.y));
+
+                    ui.end_row();
+                }
+
+                ui.label("Speed: ");
+                ui.add(
+                    DragValue::new(&mut context.animations.walker.step)
+                        .speed(1)
+                        .range(walker::STEP_RANGE),
+                );
+                ui.end_row();
             });
         });
     }

@@ -1,4 +1,5 @@
 pub mod epicycloid;
+pub mod walker;
 
 #[derive(Debug)]
 pub enum Direction {

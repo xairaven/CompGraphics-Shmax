@@ -1,6 +1,7 @@
 use crate::ui::modals::error::ErrorModal;
 use crate::utils::channel::Channel;
 use geometry::animations::epicycloid::AnimationEpicycloid;
+use geometry::animations::walker::CurveWalker;
 use geometry::figures::epicycloid::Epicycloid;
 use geometry::figures::grid::{Grid2D, Grid2DBuilder};
 use geometry::pipeline::Pipeline;
@@ -77,4 +78,5 @@ pub struct TransformContext {
 #[derive(Debug, Default)]
 pub struct AnimationsContext {
     pub epicycloid: AnimationEpicycloid,
+    pub walker: CurveWalker,
 }
