@@ -2,6 +2,9 @@ pub mod conversion;
 pub mod pipeline;
 pub mod units;
 pub mod viewport;
+pub mod animations {
+    pub mod epicycloid;
+}
 pub mod figures {
     pub mod detail;
     pub mod epicycloid;

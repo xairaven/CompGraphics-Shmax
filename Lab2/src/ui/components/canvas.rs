@@ -28,9 +28,11 @@ impl CanvasComponent {
     fn create_shapes(_ui: &mut egui::Ui, context: &mut Context) -> Vec<Shape> {
         let mut lines = vec![];
 
-        let grid: Vec<Line2D<Point2D>> = context.figures.grid.lines(&context.viewport);
+        let epicycloid = &mut context.figures.epicycloid;
+        context.animations.epicycloid.run(epicycloid);
 
-        let mut epicycloid = context.figures.epicycloid.lines();
+        let grid: Vec<Line2D<Point2D>> = context.figures.grid.lines(&context.viewport);
+        let mut epicycloid = epicycloid.lines();
 
         context
             .transformations
@@ -41,7 +43,10 @@ impl CanvasComponent {
             .rotation
             .handle(vec![&mut context.figures.epicycloid_pipeline]);
 
-        context.figures.epicycloid_pipeline.do_tasks(&mut epicycloid);
+        context
+            .figures
+            .epicycloid_pipeline
+            .do_tasks(&mut epicycloid);
 
         // Conversion to shapes
         lines.extend(grid);

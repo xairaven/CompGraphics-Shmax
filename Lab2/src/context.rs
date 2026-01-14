@@ -1,5 +1,6 @@
 use crate::ui::modals::error::ErrorModal;
 use crate::utils::channel::Channel;
+use geometry::animations::epicycloid::AnimationEpicycloid;
 use geometry::figures::epicycloid::Epicycloid;
 use geometry::figures::grid::{Grid2D, Grid2DBuilder};
 use geometry::pipeline::Pipeline;
@@ -12,6 +13,7 @@ use geometry::viewport::{Viewport, ViewportGeometry, ViewportState, ZeroPointLoc
 pub struct Context {
     pub figures: FiguresState,
     pub transformations: TransformContext,
+    pub animations: AnimationsContext,
     pub viewport: Viewport,
     pub errors_channel: Channel<ErrorModal>,
 }
@@ -21,6 +23,7 @@ impl Default for Context {
         Self {
             figures: FiguresState::default(),
             transformations: TransformContext::default(),
+            animations: AnimationsContext::default(),
 
             viewport: Viewport {
                 // Default settings like panning, zooming, etc.
@@ -69,4 +72,9 @@ impl Default for FiguresState {
 pub struct TransformContext {
     pub offset: EuclideanOffset,
     pub rotation: EuclideanRotation,
+}
+
+#[derive(Debug, Default)]
+pub struct AnimationsContext {
+    pub epicycloid: AnimationEpicycloid,
 }
