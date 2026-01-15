@@ -112,6 +112,12 @@ impl SettingsComponent {
                     ui.separator();
                     ui.add_space(10.0);
 
+                    self.measurements(ui, context);
+
+                    ui.add_space(10.0);
+                    ui.separator();
+                    ui.add_space(10.0);
+
                     self.euclidean(ui, context);
                 });
             });
@@ -121,6 +127,8 @@ impl SettingsComponent {
         ui.vertical_centered_justified(|ui| {
             ui.label(RichText::new("Epicycloid Settings").color(Color32::WHITE));
         });
+
+        let mut changed = false;
 
         Grid::new("EPICYCLOID_SETTINGS")
             .num_columns(2)
@@ -134,7 +142,7 @@ impl SettingsComponent {
                     )
                     .changed()
                 {
-                    context.animations.walker.hide();
+                    changed = true;
                 };
                 ui.end_row();
 
@@ -147,7 +155,7 @@ impl SettingsComponent {
                     )
                     .changed()
                 {
-                    context.animations.walker.hide();
+                    changed = true;
                 };
                 ui.end_row();
 
@@ -160,7 +168,7 @@ impl SettingsComponent {
                     )
                     .changed()
                 {
-                    context.animations.walker.hide();
+                    changed = true;
                 };
                 ui.end_row();
 
@@ -173,7 +181,7 @@ impl SettingsComponent {
                     )
                     .changed()
                 {
-                    context.animations.walker.hide();
+                    changed = true;
                 };
                 ui.end_row();
 
@@ -186,10 +194,15 @@ impl SettingsComponent {
                     )
                     .changed()
                 {
-                    context.animations.walker.hide();
+                    changed = true;
                 };
                 ui.end_row();
             });
+
+        if changed {
+            context.animations.walker.hide();
+            context.figures.epicycloid.calculate_stats();
+        }
 
         ui.vertical_centered_justified(|ui| {
             if ui.button("Reset").clicked() {
@@ -401,6 +414,13 @@ impl SettingsComponent {
         ui.add_space(5.0);
 
         Grid::new("CURVE_PROPERTIES").num_columns(2).show(ui, |ui| {
+            ui.label("Inflection Points");
+            ui.checkbox(
+                &mut context.animations.walker.is_inflection_points_enabled,
+                "",
+            );
+            ui.end_row();
+
             ui.label("Normal");
             ui.checkbox(&mut context.animations.walker.is_normal_enabled, "");
             ui.end_row();
@@ -417,5 +437,38 @@ impl SettingsComponent {
             );
             ui.end_row();
         });
+    }
+
+    fn measurements(&self, ui: &mut egui::Ui, context: &mut Context) {
+        ui.label(RichText::new("Measurements").color(Color32::WHITE));
+        ui.add_space(5.0);
+
+        let stats = &context.figures.epicycloid.stats;
+
+        Grid::new("CURVE_MEASUREMENTS")
+            .num_columns(2)
+            .show(ui, |ui| {
+                ui.label("Curve Length:");
+                ui.label(format!("{:.2} cm", stats.length));
+                ui.end_row();
+
+                ui.label("Curve Area:");
+                ui.label(format!("{:.2} cm²", stats.area));
+                ui.end_row();
+
+                if context.animations.walker.is_visible {
+                    let radius = context
+                        .animations
+                        .walker
+                        .current_curvature_radius(&context.figures.epicycloid);
+                    ui.label("Curvature Radius:");
+                    if radius.is_infinite() {
+                        ui.label("Infinite");
+                    } else {
+                        ui.label(format!("{:.2} cm", radius));
+                    }
+                    ui.end_row();
+                }
+            });
     }
 }

@@ -15,6 +15,7 @@ pub struct CurveWalker {
     pub is_visible: bool,
     pub step: u32,
 
+    pub is_inflection_points_enabled: bool,
     pub is_normal_enabled: bool,
     pub is_tangent_enabled: bool,
     pub lines_size: Centimeter,
@@ -39,6 +40,7 @@ impl Default for CurveWalker {
 
             direction: Direction::Increase,
 
+            is_inflection_points_enabled: false,
             is_normal_enabled: false,
             is_tangent_enabled: false,
             lines_size: Centimeter(30.0),
@@ -114,36 +116,30 @@ impl CurveWalker {
         None
     }
 
-    fn unit_derivative(&self, epicycloid: &Epicycloid) -> Option<(f64, f64)> {
-        let t = self.current_array_index as f64 * epicycloid.step;
+    fn current_t(&self, epicycloid: &Epicycloid) -> f64 {
+        self.current_array_index as f64 * epicycloid.step
+    }
 
-        let sum_r = epicycloid.fixed_radius + epicycloid.rolling_radius;
-        let k = sum_r / epicycloid.rolling_radius.value();
+    pub fn current_curvature_radius(&self, epicycloid: &Epicycloid) -> f64 {
+        epicycloid.curvature_radius_at(self.current_t(epicycloid))
+    }
 
-        // Calculate derivatives (velocity vector)
-        // x' = -S * sin(t) + d * k * sin(k*t)
-        // y' =  S * cos(t) - d * k * cos(k*t)
-        let (sin_t, cos_t) = t.sin_cos();
-        let (sin_kt, cos_kt) = (k * t).sin_cos();
-
-        let dx =
-            -sum_r.value() * sin_t + epicycloid.pen_offset.value() * k.value() * sin_kt;
-        let dy =
-            sum_r.value() * cos_t - epicycloid.pen_offset.value() * k.value() * cos_kt;
-
-        // Vector normalization (for fixed length lines, e.g., 5 cm)
+    // Helper for creating lines of fixed length
+    fn create_vector_line(&self, dx: f64, dy: f64) -> Option<Line2D<Point2D>> {
         let len = (dx * dx + dy * dy).sqrt();
-
-        // Handle zero-length vector
         if len < 1e-6 {
             return None;
         }
 
-        // Length of the tangent and normal lines
-        let unit_dx = (dx / len) * self.lines_size.value();
-        let unit_dy = (dy / len) * self.lines_size.value();
+        let scale = self.lines_size.value();
+        let u_dx = (dx / len) * scale;
+        let u_dy = (dy / len) * scale;
 
-        Some((unit_dx, unit_dy))
+        let p = self.point();
+        Some(Line2D::with_transparent(
+            Point2D::new(p.x.value() - u_dx, p.y.value() - u_dy),
+            Point2D::new(p.x.value() + u_dx, p.y.value() + u_dy),
+        ))
     }
 
     pub fn tangent(&self, epicycloid: &Epicycloid) -> Option<Line2D<Point2D>> {
@@ -151,18 +147,13 @@ impl CurveWalker {
             return None;
         }
 
-        let (unit_dx, unit_dy) = self.unit_derivative(epicycloid)?;
+        let t = self.current_t(epicycloid);
+        let (_, _, dx, dy, _, _) = epicycloid.get_derivatives(t);
 
-        // Forming lines
-        // Tangent: from (P - v) to (P + v)
-        let point = self.point();
-        let tangent = Line2D::new(
-            Point2D::new(point.x.value() - unit_dx, point.y.value() - unit_dy),
-            Point2D::new(point.x.value() + unit_dx, point.y.value() + unit_dy),
-            Stroke::new(1.5, Color32::BLUE),
-        );
-
-        Some(tangent)
+        self.create_vector_line(dx, dy).map(|mut line| {
+            line.stroke = Stroke::new(1.5, Color32::BLUE);
+            line
+        })
     }
 
     pub fn normal(&self, epicycloid: &Epicycloid) -> Option<Line2D<Point2D>> {
@@ -170,21 +161,14 @@ impl CurveWalker {
             return None;
         }
 
-        let (unit_dx, unit_dy) = self.unit_derivative(epicycloid)?;
+        let t = self.current_t(epicycloid);
+        let (_, _, dx, dy, _, _) = epicycloid.get_derivatives(t);
 
-        // Normal: Perpendicular (-dy, dx)
-        // Rotate the vector by 90 degrees
-        let norm_dx = -unit_dy;
-        let norm_dy = unit_dx;
-
-        let point = self.point();
-        let normal = Line2D::new(
-            Point2D::new(point.x.value() - norm_dx, point.y.value() - norm_dy),
-            Point2D::new(point.x.value() + norm_dx, point.y.value() + norm_dy),
-            Stroke::new(1.5, Color32::RED),
-        );
-
-        Some(normal)
+        // Normal: perpendicular (-dy, dx)
+        self.create_vector_line(-dy, dx).map(|mut line| {
+            line.stroke = Stroke::new(1.5, Color32::ORANGE);
+            line
+        })
     }
 
     pub fn hide(&mut self) {

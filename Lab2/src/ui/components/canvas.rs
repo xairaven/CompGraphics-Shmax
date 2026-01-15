@@ -1,7 +1,9 @@
 use crate::context::Context;
+use eframe::epaint::Stroke;
 use egui::{CentralPanel, Color32, Frame, Painter, Response, Sense, Shape};
 use geometry::primitives::line2d::Line2D;
 use geometry::primitives::point2d::Point2D;
+use geometry::shapes::dot::DotMetadata;
 use geometry::transformations::euclidean::rotation::EuclideanRotation;
 
 #[derive(Debug, Default)]
@@ -86,6 +88,17 @@ impl CanvasComponent {
 
         for line in additional_lines {
             painter.add(line.to_pixels(&context.viewport).to_shape());
+        }
+
+        if context.animations.walker.is_inflection_points_enabled {
+            for point in &epicycloid.stats.inflection_points {
+                let dot = point.to_pixels(&context.viewport).to_dot(&DotMetadata {
+                    radius: 5.0,
+                    fill: Color32::BROWN,
+                    stroke: Stroke::new(0.5, Color32::BLACK),
+                });
+                painter.add(dot);
+            }
         }
 
         response
