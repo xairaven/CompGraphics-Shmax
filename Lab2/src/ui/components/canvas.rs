@@ -92,6 +92,11 @@ impl CanvasComponent {
 
         if context.animations.walker.is_inflection_points_enabled {
             for point in &epicycloid.stats.inflection_points {
+                let mut point = *point;
+                context
+                    .figures
+                    .epicycloid_pipeline
+                    .do_tasks_point(&mut point);
                 let dot = point.to_pixels(&context.viewport).to_dot(&DotMetadata {
                     radius: 5.0,
                     fill: Color32::BROWN,

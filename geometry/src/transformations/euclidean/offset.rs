@@ -1,5 +1,4 @@
 use crate::pipeline::{Operation, Pipeline};
-use crate::primitives::line2d::Line2D;
 use crate::primitives::point2d::Point2D;
 use crate::units::Centimeter;
 
@@ -47,13 +46,8 @@ pub struct OffsetOperation {
 }
 
 impl OffsetOperation {
-    pub fn go(&self, lines: &mut [Line2D<Point2D>]) {
-        for line in lines.iter_mut() {
-            line.start.x += self.x;
-            line.start.y += self.y;
-
-            line.end.x += self.x;
-            line.end.y += self.y;
-        }
+    pub fn go(&self, point: &mut Point2D) {
+        point.x += self.x;
+        point.y += self.y;
     }
 }

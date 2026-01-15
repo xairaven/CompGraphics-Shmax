@@ -19,6 +19,12 @@ impl Pipeline {
             operation.go(lines);
         }
     }
+
+    pub fn do_tasks_point(&self, point: &mut Point2D) {
+        for operation in &self.buffer {
+            operation.go_point(point);
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -30,10 +36,17 @@ pub enum Operation {
 
 impl Operation {
     pub fn go(&self, lines: &mut [Line2D<Point2D>]) {
+        for line in lines.iter_mut() {
+            self.go_point(&mut line.start);
+            self.go_point(&mut line.end);
+        }
+    }
+
+    pub fn go_point(&self, point: &mut Point2D) {
         match self {
-            Self::Offset(operation) => operation.go(lines),
-            Self::Rotation(operation) => operation.go(lines),
-            Self::PointSymmetry(operation) => operation.go(lines),
+            Self::Offset(operation) => operation.go(point),
+            Self::Rotation(operation) => operation.go(point),
+            Self::PointSymmetry(operation) => operation.go(point),
         }
     }
 }

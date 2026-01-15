@@ -1,5 +1,4 @@
 use crate::pipeline::{Operation, Pipeline};
-use crate::primitives::line2d::Line2D;
 use crate::primitives::point2d::Point2D;
 use crate::shapes::dot::DotMetadata;
 use crate::units::Centimeter;
@@ -71,11 +70,8 @@ pub struct PointSymmetryOperation {
 }
 
 impl PointSymmetryOperation {
-    pub fn go(&self, lines: &mut [Line2D<Point2D>]) {
-        for line in lines.iter_mut() {
-            self.process_point(&mut line.start);
-            self.process_point(&mut line.end);
-        }
+    pub fn go(&self, point: &mut Point2D) {
+        self.process_point(point);
     }
 
     pub fn process_point(&self, point: &mut Point2D) {

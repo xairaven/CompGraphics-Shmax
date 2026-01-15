@@ -1,6 +1,5 @@
 use crate::math::angle::Angle;
 use crate::pipeline::{Operation, Pipeline};
-use crate::primitives::line2d::Line2D;
 use crate::primitives::point2d::Point2D;
 use crate::shapes::dot::DotMetadata;
 use crate::units::Centimeter;
@@ -75,11 +74,8 @@ pub struct RotationOperation {
 }
 
 impl RotationOperation {
-    pub fn go(&self, lines: &mut [Line2D<Point2D>]) {
-        for line in lines.iter_mut() {
-            self.rotate(&mut line.start);
-            self.rotate(&mut line.end);
-        }
+    pub fn go(&self, point: &mut Point2D) {
+        self.rotate(point);
     }
 
     pub fn rotate(&self, point: &mut Point2D) {
