@@ -174,6 +174,7 @@ impl CurveWalker {
     pub fn hide(&mut self) {
         self.is_normal_enabled = false;
         self.is_tangent_enabled = false;
+        self.is_inflection_points_enabled = false;
         self.is_visible = false;
         self.is_enabled = false;
     }
