@@ -76,6 +76,18 @@ impl CanvasComponent {
         let epicycloid = &mut context.figures.epicycloid;
         context.animations.epicycloid.run(ui, epicycloid);
 
+        let mut additional_lines = vec![];
+        if let Some(normal) = context.animations.walker.normal(epicycloid) {
+            additional_lines.push(normal);
+        }
+        if let Some(tangent) = context.animations.walker.tangent(epicycloid) {
+            additional_lines.push(tangent);
+        }
+
+        for line in additional_lines {
+            painter.add(line.to_pixels(&context.viewport).to_shape());
+        }
+
         response
     }
 

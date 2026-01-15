@@ -106,6 +106,12 @@ impl SettingsComponent {
                     ui.separator();
                     ui.add_space(10.0);
 
+                    self.properties(ui, context);
+
+                    ui.add_space(10.0);
+                    ui.separator();
+                    ui.add_space(10.0);
+
                     self.euclidean(ui, context);
                 });
             });
@@ -120,43 +126,68 @@ impl SettingsComponent {
             .num_columns(2)
             .show(ui, |ui| {
                 ui.label("Fixed Radius:");
-                ui.add(
-                    DragValue::new(&mut context.figures.epicycloid.fixed_radius.0)
-                        .speed(1)
-                        .range(0.0..=f64::INFINITY),
-                );
+                if ui
+                    .add(
+                        DragValue::new(&mut context.figures.epicycloid.fixed_radius.0)
+                            .speed(1)
+                            .range(0.0..=f64::INFINITY),
+                    )
+                    .changed()
+                {
+                    context.animations.walker.hide();
+                };
                 ui.end_row();
 
                 ui.label("Rolling Radius:");
-                ui.add(
-                    DragValue::new(&mut context.figures.epicycloid.rolling_radius.0)
-                        .speed(1)
-                        .range(0.0..=f64::INFINITY),
-                );
+                if ui
+                    .add(
+                        DragValue::new(&mut context.figures.epicycloid.rolling_radius.0)
+                            .speed(1)
+                            .range(0.0..=f64::INFINITY),
+                    )
+                    .changed()
+                {
+                    context.animations.walker.hide();
+                };
                 ui.end_row();
 
                 ui.label("Pen Offset:");
-                ui.add(
-                    DragValue::new(&mut context.figures.epicycloid.pen_offset.0)
-                        .speed(1)
-                        .range(0.0..=f64::INFINITY),
-                );
+                if ui
+                    .add(
+                        DragValue::new(&mut context.figures.epicycloid.pen_offset.0)
+                            .speed(1)
+                            .range(0.0..=f64::INFINITY),
+                    )
+                    .changed()
+                {
+                    context.animations.walker.hide();
+                };
                 ui.end_row();
 
                 ui.label("Rotations:");
-                ui.add(
-                    DragValue::new(&mut context.figures.epicycloid.rotations)
-                        .speed(1)
-                        .range(1..=u32::MAX),
-                );
+                if ui
+                    .add(
+                        DragValue::new(&mut context.figures.epicycloid.rotations)
+                            .speed(1)
+                            .range(1..=u32::MAX),
+                    )
+                    .changed()
+                {
+                    context.animations.walker.hide();
+                };
                 ui.end_row();
 
                 ui.label("Step:");
-                ui.add(
-                    DragValue::new(&mut context.figures.epicycloid.step)
-                        .speed(0.05)
-                        .range(0.05..=f64::INFINITY),
-                );
+                if ui
+                    .add(
+                        DragValue::new(&mut context.figures.epicycloid.step)
+                            .speed(0.05)
+                            .range(0.05..=f64::INFINITY),
+                    )
+                    .changed()
+                {
+                    context.animations.walker.hide();
+                };
                 ui.end_row();
             });
 
@@ -204,6 +235,7 @@ impl SettingsComponent {
                     ui[0].vertical_centered_justified(|ui| {
                         if ui.button("Apply").clicked() {
                             context.transformations.offset.run();
+                            context.animations.walker.hide();
                         }
                     });
                     ui[1].vertical_centered_justified(|ui| {
@@ -259,6 +291,7 @@ impl SettingsComponent {
                     ui[0].vertical_centered_justified(|ui| {
                         if ui.button("Apply").clicked() {
                             context.transformations.rotation.run();
+                            context.animations.walker.hide();
                         }
                     });
                     ui[1].vertical_centered_justified(|ui| {
@@ -357,6 +390,32 @@ impl SettingsComponent {
                 );
                 ui.end_row();
             });
+        });
+    }
+
+    fn properties(&self, ui: &mut egui::Ui, context: &mut Context) {
+        ui.vertical_centered_justified(|ui| {
+            ui.label(RichText::new("Properties").color(Color32::WHITE));
+        });
+
+        ui.add_space(5.0);
+
+        Grid::new("CURVE_PROPERTIES").num_columns(2).show(ui, |ui| {
+            ui.label("Normal");
+            ui.checkbox(&mut context.animations.walker.is_normal_enabled, "");
+            ui.end_row();
+
+            ui.label("Tangent");
+            ui.checkbox(&mut context.animations.walker.is_tangent_enabled, "");
+            ui.end_row();
+
+            ui.label("Lines Size");
+            ui.add(
+                DragValue::new(&mut context.animations.walker.lines_size.0)
+                    .speed(1)
+                    .range(1..=100),
+            );
+            ui.end_row();
         });
     }
 }

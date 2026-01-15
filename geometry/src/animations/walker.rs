@@ -1,7 +1,9 @@
 use crate::animations::Direction;
+use crate::figures::epicycloid::Epicycloid;
 use crate::primitives::line2d::Line2D;
 use crate::primitives::point2d::Point2D;
 use crate::shapes::dot::DotMetadata;
+use crate::units::Centimeter;
 use crate::viewport::Viewport;
 use egui::{Color32, Shape, Stroke};
 
@@ -12,6 +14,10 @@ pub struct CurveWalker {
     pub is_enabled: bool,
     pub is_visible: bool,
     pub step: u32,
+
+    pub is_normal_enabled: bool,
+    pub is_tangent_enabled: bool,
+    pub lines_size: Centimeter,
 
     current_point: Point2D,
     current_array_index: usize,
@@ -32,6 +38,10 @@ impl Default for CurveWalker {
             current_array_length: 0,
 
             direction: Direction::Increase,
+
+            is_normal_enabled: false,
+            is_tangent_enabled: false,
+            lines_size: Centimeter(30.0),
         }
     }
 }
@@ -102,5 +112,85 @@ impl CurveWalker {
         }
 
         None
+    }
+
+    fn unit_derivative(&self, epicycloid: &Epicycloid) -> Option<(f64, f64)> {
+        let t = self.current_array_index as f64 * epicycloid.step;
+
+        let sum_r = epicycloid.fixed_radius + epicycloid.rolling_radius;
+        let k = sum_r / epicycloid.rolling_radius.value();
+
+        // Calculate derivatives (velocity vector)
+        // x' = -S * sin(t) + d * k * sin(k*t)
+        // y' =  S * cos(t) - d * k * cos(k*t)
+        let (sin_t, cos_t) = t.sin_cos();
+        let (sin_kt, cos_kt) = (k * t).sin_cos();
+
+        let dx =
+            -sum_r.value() * sin_t + epicycloid.pen_offset.value() * k.value() * sin_kt;
+        let dy =
+            sum_r.value() * cos_t - epicycloid.pen_offset.value() * k.value() * cos_kt;
+
+        // Vector normalization (for fixed length lines, e.g., 5 cm)
+        let len = (dx * dx + dy * dy).sqrt();
+
+        // Handle zero-length vector
+        if len < 1e-6 {
+            return None;
+        }
+
+        // Length of the tangent and normal lines
+        let unit_dx = (dx / len) * self.lines_size.value();
+        let unit_dy = (dy / len) * self.lines_size.value();
+
+        Some((unit_dx, unit_dy))
+    }
+
+    pub fn tangent(&self, epicycloid: &Epicycloid) -> Option<Line2D<Point2D>> {
+        if !self.is_visible || !self.is_tangent_enabled {
+            return None;
+        }
+
+        let (unit_dx, unit_dy) = self.unit_derivative(epicycloid)?;
+
+        // Forming lines
+        // Tangent: from (P - v) to (P + v)
+        let point = self.point();
+        let tangent = Line2D::new(
+            Point2D::new(point.x.value() - unit_dx, point.y.value() - unit_dy),
+            Point2D::new(point.x.value() + unit_dx, point.y.value() + unit_dy),
+            Stroke::new(1.5, Color32::BLUE),
+        );
+
+        Some(tangent)
+    }
+
+    pub fn normal(&self, epicycloid: &Epicycloid) -> Option<Line2D<Point2D>> {
+        if !self.is_visible || !self.is_normal_enabled {
+            return None;
+        }
+
+        let (unit_dx, unit_dy) = self.unit_derivative(epicycloid)?;
+
+        // Normal: Perpendicular (-dy, dx)
+        // Rotate the vector by 90 degrees
+        let norm_dx = -unit_dy;
+        let norm_dy = unit_dx;
+
+        let point = self.point();
+        let normal = Line2D::new(
+            Point2D::new(point.x.value() - norm_dx, point.y.value() - norm_dy),
+            Point2D::new(point.x.value() + norm_dx, point.y.value() + norm_dy),
+            Stroke::new(1.5, Color32::RED),
+        );
+
+        Some(normal)
+    }
+
+    pub fn hide(&mut self) {
+        self.is_normal_enabled = false;
+        self.is_tangent_enabled = false;
+        self.is_visible = false;
+        self.is_enabled = false;
     }
 }
