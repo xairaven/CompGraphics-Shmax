@@ -249,6 +249,7 @@ impl SettingsComponent {
                         if ui.button("Apply").clicked() {
                             context.transformations.offset.run();
                             context.animations.walker.hide();
+                            context.figures.epicycloid.calculate_stats();
                         }
                     });
                     ui[1].vertical_centered_justified(|ui| {
@@ -305,6 +306,7 @@ impl SettingsComponent {
                         if ui.button("Apply").clicked() {
                             context.transformations.rotation.run();
                             context.animations.walker.hide();
+                            context.figures.epicycloid.calculate_stats();
                         }
                     });
                     ui[1].vertical_centered_justified(|ui| {

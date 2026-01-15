@@ -33,8 +33,6 @@ impl CanvasComponent {
         let grid: Vec<Line2D<Point2D>> = context.figures.grid.lines(&context.viewport);
         let mut epicycloid = context.figures.epicycloid.lines();
 
-        context.animations.walker.step(ui, &mut epicycloid);
-
         context
             .transformations
             .offset
@@ -48,6 +46,8 @@ impl CanvasComponent {
             .figures
             .epicycloid_pipeline
             .do_tasks(&mut epicycloid);
+
+        context.animations.walker.step(ui, &mut epicycloid);
 
         // Conversion to shapes
         lines.extend(grid);
