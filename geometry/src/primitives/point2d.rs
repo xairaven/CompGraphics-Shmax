@@ -121,6 +121,7 @@ impl Pointable2D for Point2DPixel {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct MoveablePoint {
     pub id: egui::Id,
     pub coordinates: Point2D,
@@ -184,5 +185,15 @@ impl MoveablePoint {
         );
 
         response.on_hover_text(label);
+    }
+}
+
+impl Pointable2D for MoveablePoint {
+    fn x(&self) -> f64 {
+        self.coordinates.x()
+    }
+
+    fn y(&self) -> f64 {
+        self.coordinates.y()
     }
 }
