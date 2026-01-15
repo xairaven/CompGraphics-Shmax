@@ -1,8 +1,9 @@
 use crate::shapes::dot::DotMetadata;
 use crate::shapes::shape::ShapeMetadata;
 use crate::units::{Centimeter, Pixel};
+use crate::viewport::Viewport;
 use egui::epaint::CircleShape;
-use egui::{Pos2, Shape};
+use egui::{Pos2, Response, Sense, Shape};
 use nalgebra::SMatrix;
 
 pub trait Pointable2D: Clone {
@@ -117,5 +118,71 @@ impl Pointable2D for Point2DPixel {
 
     fn y(&self) -> f64 {
         *self.y
+    }
+}
+
+pub struct MoveablePoint {
+    pub id: egui::Id,
+    pub coordinates: Point2D,
+    pub radius: Pixel,
+}
+
+const MOVEABLE_POINT_RADIUS: Pixel = Pixel(5.0);
+
+impl MoveablePoint {
+    pub fn new(coordinates: Point2D) -> Self {
+        Self {
+            id: egui::Id::new(rand::random::<i64>()),
+            coordinates,
+            radius: MOVEABLE_POINT_RADIUS,
+        }
+    }
+
+    pub fn with_radius(mut self, radius: Pixel) -> Self {
+        self.radius = radius;
+        self
+    }
+
+    fn interact_area(&self, viewport: &Viewport) -> egui::Rect {
+        let rect_size = egui::Vec2::splat(2.0 * self.radius.value() as f32);
+        let rect_center: Pos2 = self.coordinates.to_pixels(viewport).into();
+        egui::Rect::from_center_size(rect_center, rect_size)
+    }
+
+    pub fn update_on_pan(
+        &mut self, ui: &egui::Ui, response: Response, viewport: &Viewport,
+    ) {
+        let area = self.interact_area(viewport);
+
+        let response = ui.interact(area, response.id.with(self.id), Sense::drag());
+
+        let drag = response.drag_delta();
+        let offset = Point2DPixel {
+            x: Pixel(drag.x as f64),
+            y: Pixel(drag.y as f64),
+        }
+        .to_centimeters(viewport);
+
+        self.coordinates.x += offset.x;
+        self.coordinates.y += offset.y;
+
+        if offset != Point2D::zero() {
+            ui.ctx().request_repaint();
+        }
+    }
+
+    pub fn show_tooltip(
+        &self, index: usize, ui: &egui::Ui, response: Response, viewport: &Viewport,
+    ) {
+        let area = self.interact_area(viewport);
+
+        let response = ui.interact(area, response.id.with(self.id), Sense::hover());
+
+        let label = format!(
+            "Point #{index}.\nCoordinates:\n- X: {}\n- Y: {}",
+            self.coordinates.x, self.coordinates.y
+        );
+
+        response.on_hover_text(label);
     }
 }
