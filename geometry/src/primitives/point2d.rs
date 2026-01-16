@@ -1,3 +1,4 @@
+use crate::primitives::vector2d::{Vector2D, Vector2DPixel};
 use crate::shapes::dot::DotMetadata;
 use crate::shapes::shape::ShapeMetadata;
 use crate::shapes::square::SquareMetadata;
@@ -78,7 +79,7 @@ impl Point2DPixel {
         }
     }
 
-    pub fn zero() -> Self {
+    pub const fn zero() -> Self {
         Self {
             x: Pixel(0.0),
             y: Pixel(0.0),
@@ -167,16 +168,12 @@ impl MoveablePoint {
         let response = ui.interact(area, response.id.with(self.id), Sense::drag());
 
         let drag = response.drag_delta();
-        let offset = Point2DPixel {
-            x: Pixel(drag.x as f64),
-            y: Pixel(drag.y as f64),
-        }
-        .to_centimeters(viewport);
+        let offset = Vector2DPixel::from(drag).to_centimeters(viewport);
 
         self.coordinates.x += offset.x;
         self.coordinates.y += offset.y;
 
-        if offset != Point2D::zero() {
+        if offset != Vector2D::zero() {
             ui.ctx().request_repaint();
         }
     }
