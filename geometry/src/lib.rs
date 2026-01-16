@@ -16,6 +16,7 @@ pub mod primitives {
     pub mod circle;
     pub mod line2d;
     pub mod point2d;
+    pub mod vector2d;
 }
 pub mod shapes {
     pub mod dot;
