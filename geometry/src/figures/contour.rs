@@ -12,6 +12,7 @@ impl Default for Contour {
         Self {
             curve: FergusonCurve {
                 knots: Self::default_knots(),
+                is_closed: true,
                 step: 0.01,
                 style: Default::default(),
             },

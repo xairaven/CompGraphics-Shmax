@@ -9,12 +9,17 @@ use egui::{Color32, Shape, Stroke};
 pub struct FergusonCurve {
     pub knots: Vec<Knot>,
 
+    pub is_closed: bool,
     pub step: f64,
     pub style: CurveStyle,
 }
 
 impl FergusonCurve {
     pub fn contour(&self, viewport: &Viewport) -> Vec<Shape> {
+        if self.knots.is_empty() {
+            return vec![];
+        }
+
         let mut buffer: Vec<Line2D<Point2D>> = vec![];
 
         for knot_pair in self.knots.windows(2) {
@@ -22,6 +27,12 @@ impl FergusonCurve {
             let end = &knot_pair[1];
 
             self.segment(start, end, &mut buffer);
+        }
+
+        if self.is_closed && self.knots.len() > 2 {
+            let first = &self.knots[0];
+            let last = &self.knots[self.knots.len() - 1];
+            self.segment(last, first, &mut buffer);
         }
 
         buffer
