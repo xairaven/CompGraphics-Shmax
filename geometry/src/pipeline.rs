@@ -25,6 +25,24 @@ impl Pipeline {
             operation.go_point(point);
         }
     }
+
+    pub fn make_tasks(&mut self, lines: &mut [Line2D<Point2D>]) {
+        self.do_tasks(lines);
+        self.clear();
+    }
+
+    pub fn make_tasks_point(&mut self, point: &mut Point2D) {
+        self.do_tasks_point(point);
+        self.clear();
+    }
+
+    pub fn clear(&mut self) {
+        self.buffer.clear();
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.buffer.is_empty()
+    }
 }
 
 #[derive(Debug)]

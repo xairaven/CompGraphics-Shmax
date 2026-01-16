@@ -32,6 +32,24 @@ impl CanvasComponent {
         let curve = context.figures.contour.lines(&context.viewport);
         let skeleton = context.figures.contour.skeleton(&context.viewport);
 
+        context
+            .transformations
+            .offset
+            .handle(vec![&mut context.figures.contour_pipeline]);
+        context
+            .transformations
+            .rotation
+            .handle(vec![&mut context.figures.contour_pipeline]);
+
+        let pipeline = &mut context.figures.contour_pipeline;
+        if !pipeline.is_empty() {
+            for point in &mut context.figures.contour.curve.knots {
+                pipeline.do_tasks_point(&mut point.control.point.coordinates);
+                pipeline.do_tasks_point(&mut point.tangent.point.coordinates);
+            }
+            pipeline.clear();
+        }
+
         // Conversion to shapes
         lines.extend(grid);
 
