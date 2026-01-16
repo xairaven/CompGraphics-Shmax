@@ -4,6 +4,7 @@ pub mod pipeline;
 pub mod units;
 pub mod viewport;
 pub mod figures {
+    pub mod contour;
     pub mod detail;
     pub mod epicycloid;
     pub mod grid;
@@ -19,6 +20,10 @@ pub mod primitives {
 pub mod shapes {
     pub mod dot;
     pub mod shape;
+    pub mod square;
+}
+pub mod smooth {
+    pub mod ferguson;
 }
 pub mod transformations {
     pub mod euclidean {
