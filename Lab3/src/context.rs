@@ -59,7 +59,7 @@ pub struct FiguresState {
 impl Default for FiguresState {
     fn default() -> Self {
         Self {
-            grid: Grid2DBuilder::default().with_unit(Centimeter(5.0)).build(),
+            grid: Grid2DBuilder::default().with_unit(Centimeter(1.0)).build(),
             grid_pipeline: Default::default(),
 
             contour: Contour::default(),

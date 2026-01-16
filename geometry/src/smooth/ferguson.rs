@@ -186,9 +186,9 @@ pub struct CurveStyle {
 impl Default for CurveStyle {
     fn default() -> Self {
         Self {
-            contour: Stroke::new(2.0, Color32::BLACK),
-            skeleton: Stroke::new(1.6, Color32::DARK_GRAY),
-            control_to_tangent: Stroke::new(1.0, Color32::DARK_GREEN),
+            contour: Stroke::new(3.0, Color32::BLACK),
+            skeleton: Stroke::new(2.0, Color32::DARK_GRAY),
+            control_to_tangent: Stroke::new(1.5, Color32::DARK_GREEN),
             control: DotMetadata {
                 radius: 5.0,
                 fill: Color32::RED,
