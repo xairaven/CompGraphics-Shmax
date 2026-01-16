@@ -1,8 +1,6 @@
 use crate::ui::modals::error::ErrorModal;
 use crate::utils::channel::Channel;
-use geometry::animations::epicycloid::AnimationEpicycloid;
-use geometry::animations::walker::CurveWalker;
-use geometry::figures::epicycloid::Epicycloid;
+use geometry::figures::contour::Contour;
 use geometry::figures::grid::{Grid2D, Grid2DBuilder};
 use geometry::pipeline::Pipeline;
 use geometry::transformations::euclidean::offset::EuclideanOffset;
@@ -24,7 +22,7 @@ impl Default for Context {
         Self {
             figures: FiguresState::default(),
             transformations: TransformContext::default(),
-            animations: AnimationsContext::default(),
+            animations: AnimationsContext,
 
             viewport: Viewport {
                 // Default settings like panning, zooming, etc.
@@ -54,8 +52,8 @@ pub struct FiguresState {
     pub grid: Grid2D,
     pub grid_pipeline: Pipeline,
 
-    pub epicycloid: Epicycloid,
-    pub epicycloid_pipeline: Pipeline,
+    pub contour: Contour,
+    pub contour_pipeline: Pipeline,
 }
 
 impl Default for FiguresState {
@@ -63,8 +61,9 @@ impl Default for FiguresState {
         Self {
             grid: Grid2DBuilder::default().with_unit(Centimeter(5.0)).build(),
             grid_pipeline: Default::default(),
-            epicycloid: Default::default(),
-            epicycloid_pipeline: Default::default(),
+
+            contour: Contour::default(),
+            contour_pipeline: Default::default(),
         }
     }
 }
@@ -76,7 +75,4 @@ pub struct TransformContext {
 }
 
 #[derive(Debug, Default)]
-pub struct AnimationsContext {
-    pub epicycloid: AnimationEpicycloid,
-    pub walker: CurveWalker,
-}
+pub struct AnimationsContext;

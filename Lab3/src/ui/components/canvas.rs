@@ -29,6 +29,8 @@ impl CanvasComponent {
         let mut lines = vec![];
 
         let grid: Vec<Line2D<Point2D>> = context.figures.grid.lines(&context.viewport);
+        let curve = context.figures.contour.lines(&context.viewport);
+        let skeleton = context.figures.contour.skeleton(&context.viewport);
 
         // Conversion to shapes
         lines.extend(grid);
@@ -37,6 +39,10 @@ impl CanvasComponent {
             .iter()
             .map(|line| line.to_pixels(&context.viewport).to_shape())
             .collect::<Vec<Shape>>();
+
+        // Adding curve & skeleton
+        shapes.extend(curve);
+        shapes.extend(skeleton);
 
         // Rotation point
         if let Some(dot) = context.transformations.rotation.leading_point() {

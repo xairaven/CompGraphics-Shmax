@@ -87,9 +87,53 @@ impl SettingsComponent {
                     ui.separator();
                     ui.add_space(10.0);
 
+                    self.contour_parameters(ui, context);
+
+                    ui.add_space(10.0);
+                    ui.separator();
+                    ui.add_space(10.0);
+
                     self.euclidean(ui, context);
                 });
             });
+    }
+
+    fn contour_parameters(&self, ui: &mut egui::Ui, context: &mut Context) {
+        ui.vertical_centered_justified(|ui| {
+            ui.label(RichText::new("Contour Parameters").color(Color32::WHITE));
+        });
+
+        ui.add_space(5.0);
+
+        ui.group(|ui| {
+            ui.vertical_centered(|ui| {
+                Grid::new("Contour_Parameters")
+                    .num_columns(2)
+                    .show(ui, |ui| {
+                        ui.label("Step:");
+                        ui.add(
+                            DragValue::new(&mut context.figures.contour.curve.step)
+                                .speed(0.1)
+                                .fixed_decimals(2),
+                        );
+                        ui.end_row();
+
+                        ui.label("Skeleton:");
+                        ui.checkbox(
+                            &mut context.figures.contour.is_skeleton_mode_enabled,
+                            "",
+                        );
+                        ui.end_row();
+
+                        ui.label("Tips:");
+                        ui.checkbox(
+                            &mut context.figures.contour.is_tooltips_mode_enabled,
+                            "",
+                        );
+                        ui.end_row();
+                    });
+            });
+        });
     }
 
     fn euclidean(&self, ui: &mut egui::Ui, context: &mut Context) {
@@ -129,8 +173,6 @@ impl SettingsComponent {
                     ui[0].vertical_centered_justified(|ui| {
                         if ui.button("Apply").clicked() {
                             context.transformations.offset.run();
-                            context.animations.walker.hide();
-                            context.figures.epicycloid.calculate_stats();
                         }
                     });
                     ui[1].vertical_centered_justified(|ui| {
@@ -186,8 +228,6 @@ impl SettingsComponent {
                     ui[0].vertical_centered_justified(|ui| {
                         if ui.button("Apply").clicked() {
                             context.transformations.rotation.run();
-                            context.animations.walker.hide();
-                            context.figures.epicycloid.calculate_stats();
                         }
                     });
                     ui[1].vertical_centered_justified(|ui| {
