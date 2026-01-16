@@ -23,9 +23,7 @@ pub mod shapes {
     pub mod shape;
     pub mod square;
 }
-pub mod smooth {
-    pub mod ferguson;
-}
+pub mod smooth;
 pub mod transformations {
     pub mod euclidean {
         pub mod offset;

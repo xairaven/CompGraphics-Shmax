@@ -154,7 +154,7 @@ impl MoveablePoint {
         self
     }
 
-    fn interact_area(&self, viewport: &Viewport) -> Rect {
+    pub fn interact_area(&self, viewport: &Viewport) -> Rect {
         let rect_size = egui::Vec2::splat(2.0 * self.radius.value() as f32);
         let rect_center: Pos2 = self.coordinates.to_pixels(viewport).into();
         Rect::from_center_size(rect_center, rect_size)

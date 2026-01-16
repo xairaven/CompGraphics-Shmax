@@ -47,6 +47,8 @@ impl Contour {
             .for_each(|(index, knot)| {
                 let index = index + 1;
 
+                knot.control
+                    .update_on_change_smoothness(ui, response, viewport);
                 knot.control.point.update_on_pan(ui, response, viewport);
                 knot.tangent.point.update_on_pan(ui, response, viewport);
 

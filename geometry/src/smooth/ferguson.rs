@@ -2,9 +2,10 @@ use crate::primitives::line2d::Line2D;
 use crate::primitives::point2d::{MoveablePoint, Point2D};
 use crate::shapes::dot::DotMetadata;
 use crate::shapes::square::SquareMetadata;
+use crate::smooth::SmoothnessType;
 use crate::units::Centimeter;
 use crate::viewport::Viewport;
-use egui::{Color32, Shape, Stroke};
+use egui::{Color32, Response, Sense, Shape, Stroke};
 
 #[derive(Debug)]
 pub struct FergusonCurve {
@@ -122,11 +123,17 @@ impl FergusonCurve {
                     .to_shape();
             shapes.push(control_to_tangent);
 
-            shapes.push(
-                control_point
-                    .to_pixels(viewport)
-                    .to_dot(&self.style.control),
-            );
+            let control_point = {
+                let style = match knot.control.smoothness {
+                    Some(SmoothnessType::Break) => &self.style.control_break,
+                    Some(SmoothnessType::Smooth) => &self.style.control_smooth,
+                    None => &self.style.control_break,
+                };
+
+                control_point.to_pixels(viewport).to_dot(style)
+            };
+
+            shapes.push(control_point);
             shapes.push(
                 tangent_point
                     .to_pixels(viewport)
@@ -148,6 +155,7 @@ pub struct Knot {
 pub struct FergusonPoint {
     pub point: MoveablePoint,
     pub kind: FergusonPointKind,
+    pub smoothness: Option<SmoothnessType>,
 }
 
 impl FergusonPoint {
@@ -156,6 +164,7 @@ impl FergusonPoint {
         Self {
             point: MoveablePoint::new(point),
             kind: FergusonPointKind::Control,
+            smoothness: Some(SmoothnessType::Break),
         }
     }
 
@@ -164,6 +173,30 @@ impl FergusonPoint {
         Self {
             point: MoveablePoint::new(point),
             kind: FergusonPointKind::Tangent,
+            smoothness: None,
+        }
+    }
+
+    pub fn update_on_change_smoothness(
+        &mut self, ui: &egui::Ui, response: &Response, viewport: &Viewport,
+    ) {
+        if let FergusonPointKind::Tangent = self.kind {
+            return;
+        }
+
+        let area = self.point.interact_area(viewport);
+        let response = ui.interact(
+            area,
+            response.id.with(self.point.id),
+            Sense::click_and_drag(),
+        );
+
+        if response.secondary_clicked()
+            && let Some(smoothness) = &mut self.smoothness
+        {
+            smoothness.toggle();
+
+            ui.ctx().request_repaint();
         }
     }
 }
@@ -179,7 +212,8 @@ pub struct CurveStyle {
     pub contour: Stroke,
     pub skeleton: Stroke,
     pub control_to_tangent: Stroke,
-    pub control: DotMetadata,
+    pub control_break: DotMetadata,
+    pub control_smooth: DotMetadata,
     pub tangent: SquareMetadata,
 }
 
@@ -189,9 +223,14 @@ impl Default for CurveStyle {
             contour: Stroke::new(3.0, Color32::BLACK),
             skeleton: Stroke::new(2.0, Color32::DARK_GRAY),
             control_to_tangent: Stroke::new(1.5, Color32::DARK_GREEN),
-            control: DotMetadata {
+            control_break: DotMetadata {
                 radius: 5.0,
                 fill: Color32::RED,
+                stroke: Stroke::new(0.5, Color32::BLACK),
+            },
+            control_smooth: DotMetadata {
+                radius: 5.0,
+                fill: Color32::PURPLE,
                 stroke: Stroke::new(0.5, Color32::BLACK),
             },
             tangent: SquareMetadata {
