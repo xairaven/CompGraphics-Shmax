@@ -93,6 +93,12 @@ impl SettingsComponent {
                     ui.separator();
                     ui.add_space(10.0);
 
+                    self.animation(ui, context);
+
+                    ui.add_space(10.0);
+                    ui.separator();
+                    ui.add_space(10.0);
+
                     self.euclidean(ui, context);
                 });
             });
@@ -133,6 +139,58 @@ impl SettingsComponent {
                         );
                         ui.end_row();
                     });
+            });
+        });
+    }
+
+    fn animation(&self, ui: &mut egui::Ui, context: &mut Context) {
+        ui.group(|ui| {
+            ui.vertical_centered_justified(|ui| {
+                ui.label(RichText::new("Animation").color(Color32::WHITE));
+            });
+
+            ui.add_space(5.0);
+
+            ui.horizontal(|ui| {
+                ui.label("Status:");
+                if context.animations.contour.is_enabled {
+                    ui.colored_label(Color32::LIGHT_GREEN, "Running");
+                } else {
+                    ui.colored_label(Color32::RED, "Stopped");
+                }
+            });
+
+            ui.horizontal(|ui| {
+                ui.label("Speed:");
+                ui.add(
+                    DragValue::new(&mut context.animations.contour.speed)
+                        .speed(0.01)
+                        .range(0.0..=1.0)
+                        .fixed_decimals(2),
+                )
+            });
+
+            ui.vertical_centered_justified(|ui| {
+                let text = if context.animations.contour.is_enabled {
+                    "Stop"
+                } else {
+                    "Start"
+                };
+
+                if ui.button(text).clicked() {
+                    context.animations.contour.toggle();
+                }
+            });
+
+            ui.add_space(5.0);
+
+            ui.vertical_centered_justified(|ui| {
+                if ui.button("Reset").clicked() {
+                    context
+                        .animations
+                        .contour
+                        .reset(&mut context.figures.contour.curve.knots);
+                }
             });
         });
     }

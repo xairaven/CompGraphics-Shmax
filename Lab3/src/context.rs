@@ -1,5 +1,6 @@
 use crate::ui::modals::error::ErrorModal;
 use crate::utils::channel::Channel;
+use geometry::animations::contour::AnimationContour;
 use geometry::figures::contour::Contour;
 use geometry::figures::grid::{Grid2D, Grid2DBuilder};
 use geometry::pipeline::Pipeline;
@@ -22,7 +23,7 @@ impl Default for Context {
         Self {
             figures: FiguresState::default(),
             transformations: TransformContext::default(),
-            animations: AnimationsContext,
+            animations: AnimationsContext::default(),
 
             viewport: Viewport {
                 // Default settings like panning, zooming, etc.
@@ -75,4 +76,6 @@ pub struct TransformContext {
 }
 
 #[derive(Debug, Default)]
-pub struct AnimationsContext;
+pub struct AnimationsContext {
+    pub contour: AnimationContour,
+}

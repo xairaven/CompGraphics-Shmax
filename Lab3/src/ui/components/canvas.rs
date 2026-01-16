@@ -25,7 +25,7 @@ impl CanvasComponent {
         Self::draw(ui, context, shapes)
     }
 
-    fn create_shapes(_ui: &mut egui::Ui, context: &mut Context) -> Vec<Shape> {
+    fn create_shapes(ui: &mut egui::Ui, context: &mut Context) -> Vec<Shape> {
         let mut lines = vec![];
 
         let grid: Vec<Line2D<Point2D>> = context.figures.grid.lines(&context.viewport);
@@ -49,6 +49,11 @@ impl CanvasComponent {
             }
             pipeline.clear();
         }
+
+        context
+            .animations
+            .contour
+            .step(ui, &mut context.figures.contour.curve.knots);
 
         // Conversion to shapes
         lines.extend(grid);
