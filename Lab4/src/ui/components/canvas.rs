@@ -1,0 +1,101 @@
+use crate::context::Context;
+use egui::{CentralPanel, Color32, Frame, Painter, Response, Sense, Shape};
+use geometry::primitives::line2d::Line2D;
+use geometry::primitives::point2d::Point2D;
+use geometry::transformations::euclidean::rotation::EuclideanRotation;
+
+#[derive(Debug, Default)]
+pub struct CanvasComponent;
+
+impl CanvasComponent {
+    pub fn show(&mut self, ui: &mut egui::Ui, context: &mut Context) {
+        CentralPanel::default().show_inside(ui, |ui| {
+            Frame::canvas(ui.style())
+                .fill(Color32::WHITE)
+                .show(ui, |ui| {
+                    ui.input(|i| context.viewport.handle_scroll(i));
+                    let response = Self::pipeline(ui, context);
+                    context.viewport.handle_pan(ui, response);
+                });
+        });
+    }
+
+    fn pipeline(ui: &mut egui::Ui, context: &mut Context) -> Response {
+        let shapes = Self::create_shapes(ui, context);
+        Self::draw(ui, context, shapes)
+    }
+
+    fn create_shapes(ui: &mut egui::Ui, context: &mut Context) -> Vec<Shape> {
+        let mut lines = vec![];
+
+        let grid: Vec<Line2D<Point2D>> = context.figures.grid.lines(&context.viewport);
+        let curve = context.figures.contour.lines(&context.viewport);
+        let skeleton = context.figures.contour.skeleton(&context.viewport);
+
+        context
+            .transformations
+            .offset
+            .handle(vec![&mut context.figures.contour_pipeline]);
+        context
+            .transformations
+            .rotation
+            .handle(vec![&mut context.figures.contour_pipeline]);
+
+        let pipeline = &mut context.figures.contour_pipeline;
+        if !pipeline.is_empty() {
+            for point in &mut context.figures.contour.curve.knots {
+                pipeline.do_tasks_point(&mut point.control.point.coordinates);
+                pipeline.do_tasks_point(&mut point.tangent.point.coordinates);
+            }
+            pipeline.clear();
+        }
+
+        context
+            .animations
+            .contour
+            .step(ui, &mut context.figures.contour.curve.knots);
+
+        // Conversion to shapes
+        lines.extend(grid);
+
+        let mut shapes = lines
+            .iter()
+            .map(|line| line.to_pixels(&context.viewport).to_shape())
+            .collect::<Vec<Shape>>();
+
+        // Adding curve & skeleton
+        shapes.extend(curve);
+        shapes.extend(skeleton);
+
+        // Rotation point
+        if let Some(dot) = context.transformations.rotation.leading_point() {
+            shapes.push(EuclideanRotation::leading_shape(dot, &context.viewport));
+        }
+
+        shapes
+    }
+
+    fn draw(ui: &mut egui::Ui, context: &mut Context, shapes: Vec<Shape>) -> Response {
+        let (response, painter) = Self::initialize_painter(ui, context);
+        painter.extend(shapes);
+
+        context
+            .figures
+            .contour
+            .update_curve(ui, &response, &context.viewport);
+
+        response
+    }
+
+    fn initialize_painter(
+        ui: &mut egui::Ui, context: &mut Context,
+    ) -> (Response, Painter) {
+        let painter_size = ui.available_size_before_wrap();
+        let (response, painter) =
+            ui.allocate_painter(painter_size, Sense::click_and_drag());
+
+        context.viewport.update_state(&response);
+
+        (response, painter)
+    }
+}
