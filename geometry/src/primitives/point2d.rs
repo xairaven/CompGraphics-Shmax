@@ -1,9 +1,10 @@
 use crate::shapes::dot::DotMetadata;
 use crate::shapes::shape::ShapeMetadata;
+use crate::shapes::square::SquareMetadata;
 use crate::units::{Centimeter, Pixel};
 use crate::viewport::Viewport;
-use egui::epaint::CircleShape;
-use egui::{Pos2, Response, Sense, Shape};
+use egui::epaint::{CircleShape, RectShape};
+use egui::{Pos2, Rect, Response, Sense, Shape};
 use nalgebra::SMatrix;
 
 pub trait Pointable2D: Clone {
@@ -94,6 +95,14 @@ impl Point2DPixel {
 
         Shape::Circle(shape)
     }
+
+    pub fn to_square(self, metadata: &SquareMetadata) -> Shape {
+        let rect = metadata.rect(self);
+        let mut shape = RectShape::filled(rect, metadata.corner_radius, metadata.fill);
+        shape.stroke = metadata.stroke;
+
+        Shape::Rect(shape)
+    }
 }
 
 impl From<Point2DPixel> for Pos2 {
@@ -144,10 +153,10 @@ impl MoveablePoint {
         self
     }
 
-    fn interact_area(&self, viewport: &Viewport) -> egui::Rect {
+    fn interact_area(&self, viewport: &Viewport) -> Rect {
         let rect_size = egui::Vec2::splat(2.0 * self.radius.value() as f32);
         let rect_center: Pos2 = self.coordinates.to_pixels(viewport).into();
-        egui::Rect::from_center_size(rect_center, rect_size)
+        Rect::from_center_size(rect_center, rect_size)
     }
 
     pub fn update_on_pan(
