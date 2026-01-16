@@ -160,7 +160,7 @@ impl MoveablePoint {
     }
 
     pub fn update_on_pan(
-        &mut self, ui: &egui::Ui, response: Response, viewport: &Viewport,
+        &mut self, ui: &egui::Ui, response: &Response, viewport: &Viewport,
     ) {
         let area = self.interact_area(viewport);
 
@@ -182,7 +182,7 @@ impl MoveablePoint {
     }
 
     pub fn show_tooltip(
-        &self, index: usize, ui: &egui::Ui, response: Response, viewport: &Viewport,
+        &self, index: usize, ui: &egui::Ui, response: &Response, viewport: &Viewport,
     ) {
         let area = self.interact_area(viewport);
 

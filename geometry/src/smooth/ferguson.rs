@@ -1,6 +1,7 @@
 use crate::primitives::line2d::Line2D;
 use crate::primitives::point2d::{MoveablePoint, Point2D};
 use crate::shapes::dot::DotMetadata;
+use crate::shapes::square::SquareMetadata;
 use crate::units::Centimeter;
 use crate::viewport::Viewport;
 use egui::{Color32, Shape, Stroke};
@@ -93,6 +94,48 @@ impl FergusonCurve {
             previous_point = new_point;
         }
     }
+
+    pub fn skeleton(&self, viewport: &Viewport) -> Vec<Shape> {
+        let mut shapes = vec![];
+
+        for knot_pair in self.knots.windows(2) {
+            let start = &knot_pair[0];
+            let end = &knot_pair[1];
+
+            let line = Line2D::new(
+                start.control.point.coordinates,
+                end.control.point.coordinates,
+                self.style.skeleton,
+            )
+            .to_pixels(viewport)
+            .to_shape();
+            shapes.push(line);
+        }
+
+        for knot in &self.knots {
+            let control_point = knot.control.point.coordinates;
+            let tangent_point = knot.tangent.point.coordinates;
+
+            let control_to_tangent =
+                Line2D::new(control_point, tangent_point, self.style.control_to_tangent)
+                    .to_pixels(viewport)
+                    .to_shape();
+            shapes.push(control_to_tangent);
+
+            shapes.push(
+                control_point
+                    .to_pixels(viewport)
+                    .to_dot(&self.style.control),
+            );
+            shapes.push(
+                tangent_point
+                    .to_pixels(viewport)
+                    .to_square(&self.style.tangent),
+            );
+        }
+
+        shapes
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -135,8 +178,9 @@ pub enum FergusonPointKind {
 pub struct CurveStyle {
     pub contour: Stroke,
     pub skeleton: Stroke,
+    pub control_to_tangent: Stroke,
     pub control: DotMetadata,
-    pub tangent: DotMetadata,
+    pub tangent: SquareMetadata,
 }
 
 impl Default for CurveStyle {
@@ -144,13 +188,15 @@ impl Default for CurveStyle {
         Self {
             contour: Stroke::new(2.0, Color32::BLACK),
             skeleton: Stroke::new(1.6, Color32::DARK_GRAY),
+            control_to_tangent: Stroke::new(1.0, Color32::DARK_GREEN),
             control: DotMetadata {
                 radius: 5.0,
                 fill: Color32::RED,
                 stroke: Stroke::new(0.5, Color32::BLACK),
             },
-            tangent: DotMetadata {
+            tangent: SquareMetadata {
                 radius: 5.0,
+                corner_radius: 0.0,
                 fill: Color32::GREEN,
                 stroke: Stroke::new(0.5, Color32::BLACK),
             },
