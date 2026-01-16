@@ -113,7 +113,8 @@ impl SettingsComponent {
                         ui.label("Step:");
                         ui.add(
                             DragValue::new(&mut context.figures.contour.curve.step)
-                                .speed(0.1)
+                                .speed(0.01)
+                                .range(0.001..=1.0)
                                 .fixed_decimals(2),
                         );
                         ui.end_row();

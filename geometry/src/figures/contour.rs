@@ -1,4 +1,5 @@
-use crate::smooth::ferguson::{FergusonCurve, Knot};
+use crate::smooth::ferguson::{FergusonCurve, FergusonPoint, Knot};
+use crate::units::Centimeter;
 use crate::viewport::Viewport;
 use egui::{Response, Shape};
 
@@ -61,6 +62,31 @@ impl Contour {
     }
 
     pub fn default_knots() -> Vec<Knot> {
-        vec![]
+        vec![
+            Knot {
+                control: FergusonPoint::control(Centimeter(1.0), Centimeter(5.0)),
+                tangent: FergusonPoint::tangent(Centimeter(2.0), Centimeter(7.0)),
+            },
+            Knot {
+                control: FergusonPoint::control(Centimeter(3.0), Centimeter(5.0)),
+                tangent: FergusonPoint::tangent(Centimeter(4.0), Centimeter(7.0)),
+            },
+            Knot {
+                control: FergusonPoint::control(Centimeter(5.0), Centimeter(5.0)),
+                tangent: FergusonPoint::tangent(Centimeter(6.0), Centimeter(7.0)),
+            },
+            Knot {
+                control: FergusonPoint::control(Centimeter(7.0), Centimeter(5.0)),
+                tangent: FergusonPoint::tangent(Centimeter(8.0), Centimeter(7.0)),
+            },
+            Knot {
+                control: FergusonPoint::control(Centimeter(9.0), Centimeter(5.0)),
+                tangent: FergusonPoint::tangent(Centimeter(10.0), Centimeter(7.0)),
+            },
+            Knot {
+                control: FergusonPoint::control(Centimeter(11.0), Centimeter(5.0)),
+                tangent: FergusonPoint::tangent(Centimeter(12.0), Centimeter(7.0)),
+            },
+        ]
     }
 }

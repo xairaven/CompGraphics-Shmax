@@ -56,6 +56,11 @@ impl CanvasComponent {
         let (response, painter) = Self::initialize_painter(ui, context);
         painter.extend(shapes);
 
+        context
+            .figures
+            .contour
+            .update_curve(ui, &response, &context.viewport);
+
         response
     }
 
