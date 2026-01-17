@@ -1,6 +1,8 @@
 pub mod animations;
 pub mod conversion;
 pub mod pipeline;
+pub mod projections;
+pub mod smooth;
 pub mod units;
 pub mod viewport;
 pub mod figures {
@@ -15,7 +17,9 @@ pub mod math {
 pub mod primitives {
     pub mod circle;
     pub mod line2d;
+    pub mod line3d;
     pub mod point2d;
+    pub mod point3d;
     pub mod vector2d;
 }
 pub mod shapes {
@@ -23,7 +27,6 @@ pub mod shapes {
     pub mod shape;
     pub mod square;
 }
-pub mod smooth;
 pub mod transformations {
     pub mod euclidean {
         pub mod offset;
