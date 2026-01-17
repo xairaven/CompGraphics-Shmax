@@ -1,6 +1,5 @@
 use crate::context::Context;
 use egui::{Color32, DragValue, Grid, RichText, ScrollArea, SidePanel};
-use geometry::figures::grid;
 
 #[derive(Debug)]
 pub struct SettingsComponent {
@@ -47,18 +46,29 @@ impl SettingsComponent {
                     });
 
                     ui.horizontal(|ui| {
-                        ui.label("Unit Length:");
+                        ui.label("Axes Length:");
                         ui.add(
-                            DragValue::new(&mut context.figures.grid.unit.0)
+                            DragValue::new(&mut context.figures.grid.length.0)
                                 .speed(1)
-                                .range(grid::UNIT_RANGE),
+                                .range(1.0..=f64::INFINITY),
                         );
+                    });
 
-                        ui.vertical_centered_justified(|ui| {
-                            if ui.button("Reset").clicked() {
-                                context.figures.grid.reset_unit();
-                            }
-                        });
+                    ui.horizontal(|ui| {
+                        ui.label("Perspective Distance:");
+                        ui.add(
+                            DragValue::new(&mut context.projections.twopoint.distance.0)
+                                .speed(1)
+                                .range(1.0..=f64::INFINITY),
+                        );
+                    });
+
+                    ui.horizontal(|ui| {
+                        ui.label("Rotation (Y) Angle:");
+                        ui.add(
+                            DragValue::new(&mut context.projections.twopoint.angle)
+                                .speed(1),
+                        );
                     });
 
                     Grid::new("AUXILIARY_SETTINGS")

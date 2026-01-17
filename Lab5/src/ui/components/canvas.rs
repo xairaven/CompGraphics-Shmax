@@ -2,7 +2,6 @@ use crate::context::Context;
 use egui::{CentralPanel, Color32, Frame, Painter, Response, Sense, Shape};
 use geometry::primitives::line2d::Line2D;
 use geometry::primitives::point2d::Point2D;
-use geometry::transformations::euclidean::rotation::EuclideanRotation;
 
 #[derive(Debug, Default)]
 pub struct CanvasComponent;
@@ -28,22 +27,21 @@ impl CanvasComponent {
     fn create_shapes(_ui: &mut egui::Ui, context: &mut Context) -> Vec<Shape> {
         let mut lines = vec![];
 
-        let grid: Vec<Line2D<Point2D>> = context.figures.grid.lines(&context.viewport);
+        let grid: Vec<Line2D<Point2D>> = context
+            .figures
+            .grid
+            .lines()
+            .iter()
+            .map(|line| line.to_2d(&context.projections.twopoint))
+            .collect();
 
         // Conversion to shapes
         lines.extend(grid);
 
-        let mut shapes = lines
+        lines
             .iter()
             .map(|line| line.to_pixels(&context.viewport).to_shape())
-            .collect::<Vec<Shape>>();
-
-        // Rotation point
-        if let Some(dot) = context.transformations.rotation.leading_point() {
-            shapes.push(EuclideanRotation::leading_shape(dot, &context.viewport));
-        }
-
-        shapes
+            .collect::<Vec<Shape>>()
     }
 
     fn draw(ui: &mut egui::Ui, context: &mut Context, shapes: Vec<Shape>) -> Response {

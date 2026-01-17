@@ -10,6 +10,7 @@ pub mod figures {
     pub mod detail;
     pub mod epicycloid;
     pub mod grid;
+    pub mod grid3d;
 }
 pub mod math {
     pub mod angle;

@@ -55,6 +55,10 @@ impl Pointable3D for Point3D {
     fn to_2d<M: Projection>(&self, projection: &M) -> Point2D {
         let vector = self.to_vector() * projection.matrix();
 
-        Point2D::new(vector.x, vector.y)
+        // NECESSARY Dividing on W
+        // W contains information about depth: (1 - z/d)
+        let w = if vector.w.abs() < 1e-6 { 1.0 } else { vector.w };
+
+        Point2D::new(vector.x / w, vector.y / w)
     }
 }

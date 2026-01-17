@@ -1,15 +1,16 @@
 use crate::ui::modals::error::ErrorModal;
 use crate::utils::channel::Channel;
-use geometry::figures::grid::{Grid2D, Grid2DBuilder};
+use geometry::figures::grid3d::Grid3D;
 use geometry::pipeline::Pipeline;
+use geometry::projections::twopoint::TwoPointPerspective;
 use geometry::transformations::euclidean::offset::EuclideanOffset;
 use geometry::transformations::euclidean::rotation::EuclideanRotation;
-use geometry::units::Centimeter;
 use geometry::viewport::{Viewport, ViewportGeometry, ViewportState, ZeroPointLocation};
 
 #[derive(Debug)]
 pub struct Context {
     pub figures: FiguresState,
+    pub projections: ProjectionsContext,
     pub transformations: TransformContext,
     pub animations: AnimationsContext,
     pub viewport: Viewport,
@@ -20,6 +21,7 @@ impl Default for Context {
     fn default() -> Self {
         Self {
             figures: FiguresState::default(),
+            projections: ProjectionsContext::default(),
             transformations: TransformContext::default(),
             animations: AnimationsContext,
 
@@ -46,19 +48,10 @@ impl Context {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct FiguresState {
-    pub grid: Grid2D,
+    pub grid: Grid3D,
     pub grid_pipeline: Pipeline,
-}
-
-impl Default for FiguresState {
-    fn default() -> Self {
-        Self {
-            grid: Grid2DBuilder::default().with_unit(Centimeter(1.0)).build(),
-            grid_pipeline: Default::default(),
-        }
-    }
 }
 
 #[derive(Debug, Default)]
@@ -69,3 +62,8 @@ pub struct TransformContext {
 
 #[derive(Debug, Default)]
 pub struct AnimationsContext;
+
+#[derive(Debug, Default)]
+pub struct ProjectionsContext {
+    pub twopoint: TwoPointPerspective,
+}
