@@ -80,6 +80,12 @@ impl SettingsComponent {
                     ui.separator();
                     ui.add_space(10.0);
 
+                    self.star(ui, context);
+
+                    ui.add_space(10.0);
+                    ui.separator();
+                    ui.add_space(10.0);
+
                     self.matrix(ui, context);
 
                     ui.add_space(10.0);
@@ -91,8 +97,42 @@ impl SettingsComponent {
             });
     }
 
+    fn star(&self, ui: &mut egui::Ui, context: &mut Context) {
+        ui.label(RichText::new("Star").color(Color32::WHITE));
+
+        ui.add_space(5.0);
+
+        Grid::new("STAR_SETTINGS").num_columns(2).show(ui, |ui| {
+            ui.label("Radius:");
+            ui.add(
+                DragValue::new(&mut context.figures.star.radius.0)
+                    .speed(0.1)
+                    .fixed_decimals(2),
+            );
+            ui.end_row();
+
+            ui.label("Thickness:");
+            ui.add(
+                DragValue::new(&mut context.figures.star.thickness.0)
+                    .speed(0.1)
+                    .fixed_decimals(2),
+            );
+            ui.end_row();
+        });
+
+        ui.add_space(5.0);
+
+        ui.vertical_centered_justified(|ui| {
+            if ui.button("Reset").clicked() {
+                context.figures.star.reset();
+            }
+        });
+    }
+
     fn matrix(&self, ui: &mut egui::Ui, context: &mut Context) {
         ui.label(RichText::new("Perspective Coefficients").color(Color32::WHITE));
+
+        ui.add_space(5.0);
 
         ui.horizontal(|ui| {
             ui.label("Q (X vanish):");

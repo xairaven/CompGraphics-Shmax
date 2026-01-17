@@ -1,11 +1,12 @@
 use crate::primitives::line3d::Line3D;
 use crate::primitives::point3d::Point3D;
+use crate::units::Centimeter;
 use egui::{Color32, Stroke};
 
 #[derive(Debug)]
 pub struct Star3D {
-    pub radius: f64,
-    pub thickness: f64,
+    pub radius: Centimeter,
+    pub thickness: Centimeter,
 
     pub stroke: Stroke,
 }
@@ -13,8 +14,8 @@ pub struct Star3D {
 impl Default for Star3D {
     fn default() -> Self {
         Self {
-            radius: 5.0,
-            thickness: 2.5,
+            radius: Centimeter(5.0),
+            thickness: Centimeter(2.5),
 
             stroke: Stroke::new(5.0, Color32::BLACK),
         }
@@ -31,7 +32,7 @@ impl Star3D {
         let radius = self.radius;
         let inner_radius = radius / 2.0;
 
-        let initial_thickness = 0.0;
+        let initial_thickness = Centimeter(0.0);
         let thickness = self.thickness;
 
         for k in 0..=4 {
@@ -71,14 +72,21 @@ impl Star3D {
     }
 
     // https://math.stackexchange.com/questions/3582342/coordinates-of-the-vertices-of-a-five-pointed-star
-    fn create_point(&self, angle: f64, radius: f64, thickness: f64) -> Point3D {
-        let x = radius * f64::cos(angle);
-        let y = radius * f64::sin(angle);
-        let z = thickness;
-        Point3D::new(x, y, z)
+    fn create_point(
+        &self, angle: f64, radius: Centimeter, thickness: Centimeter,
+    ) -> Point3D {
+        Point3D {
+            x: radius * f64::cos(angle),
+            y: radius * f64::sin(angle),
+            z: thickness,
+        }
     }
 
     pub fn pivot_point(&self) -> Point3D {
-        Point3D::new(0.0, 0.0, self.thickness / 2.0)
+        Point3D::new(0.0, 0.0, self.thickness.value() / 2.0)
+    }
+
+    pub fn reset(&mut self) {
+        *self = Default::default();
     }
 }
