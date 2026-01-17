@@ -54,23 +54,6 @@ impl SettingsComponent {
                         );
                     });
 
-                    ui.horizontal(|ui| {
-                        ui.label("Perspective Distance:");
-                        ui.add(
-                            DragValue::new(&mut context.projections.twopoint.distance.0)
-                                .speed(1)
-                                .range(1.0..=f64::INFINITY),
-                        );
-                    });
-
-                    ui.horizontal(|ui| {
-                        ui.label("Rotation (Y) Angle:");
-                        ui.add(
-                            DragValue::new(&mut context.projections.twopoint.angle)
-                                .speed(1),
-                        );
-                    });
-
                     Grid::new("AUXILIARY_SETTINGS")
                         .num_columns(3)
                         .show(ui, |ui| {
@@ -97,9 +80,50 @@ impl SettingsComponent {
                     ui.separator();
                     ui.add_space(10.0);
 
+                    self.matrix(ui, context);
+
+                    ui.add_space(10.0);
+                    ui.separator();
+                    ui.add_space(10.0);
+
                     self.euclidean(ui, context);
                 });
             });
+    }
+
+    fn matrix(&self, ui: &mut egui::Ui, context: &mut Context) {
+        ui.label(RichText::new("Perspective Coefficients").color(Color32::WHITE));
+
+        ui.horizontal(|ui| {
+            ui.label("Q (X vanish):");
+            ui.add(
+                DragValue::new(&mut context.projections.twopoint.q)
+                    .speed(0.0001)
+                    .fixed_decimals(4),
+            );
+        });
+
+        ui.horizontal(|ui| {
+            ui.label("R (Z vanish):");
+            ui.add(
+                DragValue::new(&mut context.projections.twopoint.r)
+                    .speed(0.0001)
+                    .fixed_decimals(4),
+            );
+        });
+
+        ui.vertical_centered_justified(|ui| {
+            if ui.button("1-Point (Z)").clicked() {
+                context.projections.twopoint.q = 0.0;
+                context.projections.twopoint.r = 0.002;
+            }
+        });
+        ui.vertical_centered_justified(|ui| {
+            if ui.button("2-Point").clicked() {
+                context.projections.twopoint.q = 0.002;
+                context.projections.twopoint.r = 0.002;
+            }
+        });
     }
 
     fn euclidean(&self, ui: &mut egui::Ui, context: &mut Context) {

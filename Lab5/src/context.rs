@@ -1,6 +1,7 @@
 use crate::ui::modals::error::ErrorModal;
 use crate::utils::channel::Channel;
 use geometry::figures::grid3d::Grid3D;
+use geometry::figures::star3d::Star3D;
 use geometry::pipeline::Pipeline;
 use geometry::projections::twopoint::TwoPointPerspective;
 use geometry::transformations::euclidean::offset::EuclideanOffset;
@@ -52,6 +53,8 @@ impl Context {
 pub struct FiguresState {
     pub grid: Grid3D,
     pub grid_pipeline: Pipeline,
+    pub star: Star3D,
+    pub star_pipeline: Pipeline,
 }
 
 #[derive(Debug, Default)]

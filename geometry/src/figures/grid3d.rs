@@ -26,6 +26,10 @@ impl Default for Grid3D {
 
 impl Grid3D {
     pub fn lines(&self) -> Vec<Line3D<Point3D>> {
+        if !self.is_enabled {
+            return vec![];
+        }
+
         let x = Line3D {
             start: self.origin,
             end: Point3D {
