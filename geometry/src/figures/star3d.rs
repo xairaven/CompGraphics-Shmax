@@ -39,11 +39,11 @@ impl Star3D {
                 k as f64 * 2.0 * std::f64::consts::PI / 5.0 + std::f64::consts::PI / 2.0;
             let offset_angle = angle + 2.0 * std::f64::consts::PI / 10.0;
 
-            let outer = Self::point(angle, radius, initial_thickness);
-            let inner = Self::point(offset_angle, inner_radius, initial_thickness);
+            let outer = self.create_point(angle, radius, initial_thickness);
+            let inner = self.create_point(offset_angle, inner_radius, initial_thickness);
 
-            let upper_outer = Self::point(angle, radius, thickness);
-            let upper_inner = Self::point(offset_angle, inner_radius, thickness);
+            let upper_outer = self.create_point(angle, radius, thickness);
+            let upper_inner = self.create_point(offset_angle, inner_radius, thickness);
 
             points.push(outer);
             points.push(inner);
@@ -71,17 +71,14 @@ impl Star3D {
     }
 
     // https://math.stackexchange.com/questions/3582342/coordinates-of-the-vertices-of-a-five-pointed-star
-    fn point(angle: f64, radius: f64, thickness: f64) -> Point3D {
+    fn create_point(&self, angle: f64, radius: f64, thickness: f64) -> Point3D {
         let x = radius * f64::cos(angle);
         let y = radius * f64::sin(angle);
-        Point3D::new(x, y, thickness)
+        let z = thickness;
+        Point3D::new(x, y, z)
     }
 
-    pub fn pivot_point(&self, offset: Point3D) -> Point3D {
-        Point3D::new(
-            0.0 + offset.x.value(),
-            0.0 + offset.y.value(),
-            self.thickness / 2.0 + offset.z.value(),
-        )
+    pub fn pivot_point(&self) -> Point3D {
+        Point3D::new(0.0, 0.0, self.thickness / 2.0)
     }
 }

@@ -32,7 +32,9 @@ pub mod shapes {
 pub mod transformations {
     pub mod euclidean {
         pub mod offset;
+        pub mod offset3d;
         pub mod rotation;
+        pub mod rotation3d;
     }
     pub mod affine;
     pub mod projective;

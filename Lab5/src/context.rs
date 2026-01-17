@@ -2,10 +2,10 @@ use crate::ui::modals::error::ErrorModal;
 use crate::utils::channel::Channel;
 use geometry::figures::grid3d::Grid3D;
 use geometry::figures::star3d::Star3D;
-use geometry::pipeline::Pipeline;
+use geometry::pipeline::Pipeline3D;
 use geometry::projections::twopoint::TwoPointPerspective;
-use geometry::transformations::euclidean::offset::EuclideanOffset;
-use geometry::transformations::euclidean::rotation::EuclideanRotation;
+use geometry::transformations::euclidean::offset3d::EuclideanOffset3D;
+use geometry::transformations::euclidean::rotation3d::EuclideanRotation3D;
 use geometry::viewport::{Viewport, ViewportGeometry, ViewportState, ZeroPointLocation};
 
 #[derive(Debug)]
@@ -52,15 +52,14 @@ impl Context {
 #[derive(Debug, Default)]
 pub struct FiguresState {
     pub grid: Grid3D,
-    pub grid_pipeline: Pipeline,
     pub star: Star3D,
-    pub star_pipeline: Pipeline,
+    pub star_pipeline: Pipeline3D,
 }
 
 #[derive(Debug, Default)]
 pub struct TransformContext {
-    pub offset: EuclideanOffset,
-    pub rotation: EuclideanRotation,
+    pub offset: EuclideanOffset3D,
+    pub rotation: EuclideanRotation3D,
 }
 
 #[derive(Debug, Default)]

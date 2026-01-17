@@ -1,7 +1,9 @@
 use crate::context::Context;
 use egui::{CentralPanel, Color32, Frame, Painter, Response, Sense, Shape};
 use geometry::primitives::line2d::Line2D;
+use geometry::primitives::line3d::Line3D;
 use geometry::primitives::point2d::Point2D;
+use geometry::primitives::point3d::Point3D;
 
 #[derive(Debug, Default)]
 pub struct CanvasComponent;
@@ -35,10 +37,24 @@ impl CanvasComponent {
             .map(|line| line.to_2d(&context.projections.twopoint))
             .collect();
 
-        let star: Vec<Line2D<Point2D>> = context
+        let mut star: Vec<Line3D<Point3D>> = context.figures.star.lines();
+        let mut pivot = context.figures.star.pivot_point();
+
+        context
+            .transformations
+            .offset
+            .handle(vec![&mut context.figures.star_pipeline]);
+        context
+            .transformations
+            .rotation
+            .handle(vec![&mut context.figures.star_pipeline]);
+
+        context
             .figures
-            .star
-            .lines()
+            .star_pipeline
+            .do_tasks(&mut star, &mut pivot);
+
+        let star: Vec<Line2D<Point2D>> = star
             .iter()
             .map(|line| line.to_2d(&context.projections.twopoint))
             .collect();

@@ -147,6 +147,7 @@ impl SettingsComponent {
                         .speed(0.1)
                         .fixed_decimals(2),
                 );
+                ui.end_row();
 
                 ui.label("Y:");
                 ui.add(
@@ -154,6 +155,15 @@ impl SettingsComponent {
                         .speed(0.1)
                         .fixed_decimals(2),
                 );
+                ui.end_row();
+
+                ui.label("Z:");
+                ui.add(
+                    DragValue::new(&mut context.transformations.offset.z.0)
+                        .speed(0.1)
+                        .fixed_decimals(2),
+                );
+                ui.end_row();
             });
 
             ui.add_space(5.0);
@@ -186,25 +196,25 @@ impl SettingsComponent {
             Grid::new("EUCLIDEAN_Rotation")
                 .num_columns(2)
                 .show(ui, |ui| {
-                    ui.label("X:");
+                    ui.label("Angle X:");
                     ui.add(
-                        DragValue::new(&mut context.transformations.rotation.x.0)
+                        DragValue::new(&mut context.transformations.rotation.angle_x)
                             .speed(0.1)
                             .fixed_decimals(2),
                     );
                     ui.end_row();
 
-                    ui.label("Y:");
+                    ui.label("Angle Y:");
                     ui.add(
-                        DragValue::new(&mut context.transformations.rotation.y.0)
+                        DragValue::new(&mut context.transformations.rotation.angle_y)
                             .speed(0.1)
                             .fixed_decimals(2),
                     );
                     ui.end_row();
 
-                    ui.label("Angle:");
+                    ui.label("Angle Z:");
                     ui.add(
-                        DragValue::new(&mut context.transformations.rotation.angle)
+                        DragValue::new(&mut context.transformations.rotation.angle_z)
                             .speed(1)
                             .suffix(" °"),
                     );
