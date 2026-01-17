@@ -1,5 +1,5 @@
 [package]
-name = "Lab3"
+name = "Lab3-4"
 version = "0.1.0"
 authors = ["Maksym Murenets"]
 
@@ -14,7 +14,7 @@ workspace = true
 [dependencies]
 geometry = { path = "../geometry" }
 
-chrono = "0.4.42"
+chrono = "0.4.43"
 crossbeam = "0.8.4"
 egui = "0.33.3"
 eframe = { version = "0.33.3", default-features = false, features = [
