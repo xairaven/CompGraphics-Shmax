@@ -1,8 +1,9 @@
+use crate::figures::texture::Texture;
 use crate::primitives::line2d::Line2D;
 use crate::primitives::line3d::Line3D;
 use crate::primitives::point2d::Point2D;
 use crate::primitives::point3d::Point3D;
-use crate::units::Centimeter;
+use crate::units::{Centimeter, Percent};
 use egui::Stroke;
 
 #[derive(Debug)]
@@ -10,6 +11,11 @@ pub struct Surface {
     pub height: Centimeter,
     pub radius_base: Centimeter,
     pub mesh: usize,
+    pub is_texture_enabled: bool,
+    pub texture_scale_width: Percent,
+    pub texture_scale_height: Percent,
+    pub texture_offset_angle: Percent,
+    pub texture_offset_height: Percent,
     pub style: SurfaceStyle,
 }
 
@@ -19,6 +25,11 @@ impl Default for Surface {
             height: Centimeter(10.0),
             radius_base: Centimeter(5.0),
             mesh: 20,
+            texture_scale_width: Percent(0.3),
+            texture_scale_height: Percent(0.5),
+            texture_offset_angle: Percent(0.0),
+            texture_offset_height: Percent(0.5),
+            is_texture_enabled: false,
             style: SurfaceStyle::default(),
         }
     }
@@ -65,35 +76,56 @@ impl Surface {
         }
     }
 
+    pub fn handle_texture(&self, texture: &Texture) -> Vec<Line3D<Point3D>> {
+        if !self.is_texture_enabled {
+            return Vec::new();
+        }
+
+        let lines = texture.lines();
+        self.map_texture(&lines)
+    }
+
     pub fn map_texture(&self, texture_lines: &[Line2D<Point2D>]) -> Vec<Line3D<Point3D>> {
         if texture_lines.is_empty() {
             return vec![];
         }
 
         let (min_x, max_x, min_y, max_y) = self.calculate_bounds(texture_lines);
-
-        let width = max_x - min_x;
-        let height = max_y - min_y;
-
-        let width = if width.abs() < 1e-6 { 1.0 } else { width };
-        let height = if height.abs() < 1e-6 { 1.0 } else { height };
+        let width = (max_x - min_x).abs().max(1e-6);
+        let height = (max_y - min_y).abs().max(1e-6);
 
         texture_lines
             .iter()
             .map(|line| {
-                let start_uv = self.normalize(line.start, min_x, min_y, width, height);
-                let end_uv = self.normalize(line.end, min_x, min_y, width, height);
+                let start_uv_raw =
+                    self.normalize(line.start, min_x, min_y, width, height);
+                let end_uv_raw = self.normalize(line.end, min_x, min_y, width, height);
 
-                if (start_uv.0 - end_uv.0).abs() > 0.8 {
+                let start_uv_mapped = self.apply_uv_transform(start_uv_raw);
+                let end_uv_mapped = self.apply_uv_transform(end_uv_raw);
+
+                if (start_uv_mapped.0 - end_uv_mapped.0).abs() > 0.8 {
                     return Line3D::with_transparent(Point3D::zero(), Point3D::zero());
                 }
 
-                let p1_3d = self.point_at(start_uv.0, start_uv.1);
-                let p2_3d = self.point_at(end_uv.0, end_uv.1);
+                let p1_3d = self.point_at(start_uv_mapped.0, start_uv_mapped.1);
+                let p2_3d = self.point_at(end_uv_mapped.0, end_uv_mapped.1);
 
                 Line3D::new(p1_3d, p2_3d, line.stroke)
             })
             .collect()
+    }
+
+    fn apply_uv_transform(&self, uv: (f64, f64)) -> (f64, f64) {
+        let (u_raw, v_raw) = uv;
+        let (scale_u, scale_v) = (self.texture_scale_width, self.texture_scale_height);
+        let (offset_u, offset_v) =
+            (self.texture_offset_angle, self.texture_offset_height);
+
+        let u_final = offset_u.value() + (u_raw - 0.5) * scale_u.value();
+        let v_final = offset_v.value() + (v_raw - 0.5) * scale_v.value();
+
+        (u_final, v_final)
     }
 
     fn normalize(

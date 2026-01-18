@@ -6,7 +6,6 @@ use egui::Stroke;
 
 #[derive(Debug)]
 pub struct Texture {
-    pub is_enabled: bool,
     pub style: TextureStyle,
 
     lines: Vec<Line2D<Point2D>>,
@@ -27,7 +26,6 @@ impl Default for Texture {
         let lines = contour.lines();
 
         Self {
-            is_enabled: false,
             style: Default::default(),
             lines,
         }
@@ -55,7 +53,8 @@ pub struct TextureStyle {
 impl Default for TextureStyle {
     fn default() -> Self {
         Self {
-            stroke: Stroke::new(1.5, egui::Color32::PURPLE),
+            // Pink
+            stroke: Stroke::new(1.5, egui::Color32::from_rgb(255, 105, 180)),
         }
     }
 }

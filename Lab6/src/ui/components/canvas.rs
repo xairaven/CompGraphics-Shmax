@@ -43,9 +43,18 @@ impl CanvasComponent {
             .map(|line| line.to_2d(&context.projections.twopoint))
             .collect();
 
+        let texture: Vec<Line2D<Point2D>> = context
+            .figures
+            .surface
+            .handle_texture(&context.figures.texture)
+            .iter()
+            .map(|line| line.to_2d(&context.projections.twopoint))
+            .collect();
+
         // Conversion to shapes
         lines.extend(grid);
         lines.extend(surface);
+        lines.extend(texture);
 
         lines
             .iter()

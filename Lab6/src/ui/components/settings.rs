@@ -1,5 +1,6 @@
 use crate::context::Context;
 use egui::{Color32, DragValue, Grid, RichText, ScrollArea, SidePanel};
+use geometry::units::Percent;
 
 #[derive(Debug)]
 pub struct SettingsComponent {
@@ -92,6 +93,12 @@ impl SettingsComponent {
                     ui.separator();
                     ui.add_space(10.0);
 
+                    self.texture(ui, context);
+
+                    ui.add_space(10.0);
+                    ui.separator();
+                    ui.add_space(10.0);
+
                     self.euclidean(ui, context);
                 });
             });
@@ -127,6 +134,50 @@ impl SettingsComponent {
                     .speed(1)
                     .range(10.0..=f64::INFINITY)
                     .fixed_decimals(0),
+            );
+            ui.end_row();
+        });
+    }
+
+    fn texture(&self, ui: &mut egui::Ui, context: &mut Context) {
+        ui.label(RichText::new("Texture Settings").color(Color32::WHITE));
+
+        ui.add_space(5.0);
+
+        Grid::new("Texture Settings").num_columns(2).show(ui, |ui| {
+            ui.label("Texture Enabled:");
+            ui.checkbox(&mut context.figures.surface.is_texture_enabled, "");
+            ui.end_row();
+
+            ui.label("Width Scale (U):");
+            ui.add(
+                DragValue::new(&mut context.figures.surface.texture_scale_width.0)
+                    .speed(0.01)
+                    .range(Percent::RANGE),
+            );
+            ui.end_row();
+
+            ui.label("Position Angle (U):");
+            ui.add(
+                DragValue::new(&mut context.figures.surface.texture_offset_angle.0)
+                    .speed(0.01)
+                    .range(Percent::RANGE),
+            );
+            ui.end_row();
+
+            ui.label("Height Scale (V):");
+            ui.add(
+                DragValue::new(&mut context.figures.surface.texture_scale_height.0)
+                    .speed(0.01)
+                    .range(Percent::RANGE),
+            );
+            ui.end_row();
+
+            ui.label("Position Height (V):");
+            ui.add(
+                DragValue::new(&mut context.figures.surface.texture_offset_height.0)
+                    .speed(0.01)
+                    .range(Percent::RANGE),
             );
             ui.end_row();
         });
