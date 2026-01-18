@@ -1,5 +1,6 @@
 use crate::ui::modals::error::ErrorModal;
 use crate::utils::channel::Channel;
+use geometry::animations::cone::AnimationCone;
 use geometry::figures::grid3d::Grid3D;
 use geometry::figures::surface::Surface;
 use geometry::figures::texture::Texture;
@@ -26,7 +27,7 @@ impl Default for Context {
             figures: FiguresState::default(),
             projections: ProjectionsContext::default(),
             transformations: TransformContext::default(),
-            animations: AnimationsContext,
+            animations: AnimationsContext::default(),
             pipelines: Pipelines::default(),
 
             viewport: Viewport {
@@ -71,7 +72,9 @@ pub struct TransformContext {
 }
 
 #[derive(Debug, Default)]
-pub struct AnimationsContext;
+pub struct AnimationsContext {
+    pub cone: AnimationCone,
+}
 
 #[derive(Debug, Default)]
 pub struct ProjectionsContext {

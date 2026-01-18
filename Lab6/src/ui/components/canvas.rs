@@ -26,7 +26,7 @@ impl CanvasComponent {
         Self::draw(ui, context, shapes)
     }
 
-    fn create_shapes(_ui: &mut egui::Ui, context: &mut Context) -> Vec<Shape> {
+    fn create_shapes(ui: &mut egui::Ui, context: &mut Context) -> Vec<Shape> {
         let mut lines = vec![];
 
         let grid: Vec<Line2D<Point2D>> = context
@@ -36,6 +36,10 @@ impl CanvasComponent {
             .iter()
             .map(|line| line.to_2d(&context.projections.twopoint))
             .collect();
+
+        // Animation
+        let cone = &mut context.figures.surface;
+        context.animations.cone.run(ui, cone);
 
         let surface: Vec<Line3D<Point3D>> = context.figures.surface.lines();
         let mut pivot = context.figures.surface.pivot_point();

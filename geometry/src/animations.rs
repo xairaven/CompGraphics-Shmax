@@ -1,3 +1,4 @@
+pub mod cone;
 pub mod contour;
 pub mod epicycloid;
 pub mod star;
