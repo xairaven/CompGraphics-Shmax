@@ -29,7 +29,7 @@ impl CanvasComponent {
         let mut lines = vec![];
 
         let grid: Vec<Line2D<Point2D>> = context.figures.grid.lines(&context.viewport);
-        let curve = context.figures.contour.lines(&context.viewport);
+        let curve = context.figures.contour.shapes(&context.viewport);
         let skeleton = context.figures.contour.skeleton(&context.viewport);
 
         context

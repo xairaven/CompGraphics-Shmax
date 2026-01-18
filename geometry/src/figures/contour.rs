@@ -1,3 +1,5 @@
+use crate::primitives::line2d::Line2D;
+use crate::primitives::point2d::Point2D;
 use crate::smooth::ferguson::{FergusonCurve, FergusonPoint, Knot};
 use crate::units::Centimeter;
 use crate::viewport::Viewport;
@@ -26,8 +28,12 @@ impl Default for Contour {
 }
 
 impl Contour {
-    pub fn lines(&self, viewport: &Viewport) -> Vec<Shape> {
+    pub fn shapes(&self, viewport: &Viewport) -> Vec<Shape> {
         self.curve.contour(viewport)
+    }
+
+    pub fn lines(&self) -> Vec<Line2D<Point2D>> {
+        self.curve.lines()
     }
 
     pub fn skeleton(&self, viewport: &Viewport) -> Vec<Shape> {

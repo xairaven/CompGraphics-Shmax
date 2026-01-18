@@ -22,6 +22,13 @@ impl FergusonCurve {
             return vec![];
         }
 
+        self.lines()
+            .iter()
+            .map(|line| line.to_pixels(viewport).to_shape())
+            .collect()
+    }
+
+    pub fn lines(&self) -> Vec<Line2D<Point2D>> {
         let mut buffer: Vec<Line2D<Point2D>> = vec![];
 
         for knot_pair in self.knots.windows(2) {
@@ -38,9 +45,6 @@ impl FergusonCurve {
         }
 
         buffer
-            .iter()
-            .map(|line| line.to_pixels(viewport).to_shape())
-            .collect()
     }
 
     fn segment(&self, start: &Knot, end: &Knot, buffer: &mut Vec<Line2D<Point2D>>) {
