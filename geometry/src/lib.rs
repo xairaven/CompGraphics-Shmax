@@ -1,5 +1,6 @@
 pub mod animations;
 pub mod conversion;
+pub mod fractals;
 pub mod pipeline;
 pub mod projections;
 pub mod smooth;

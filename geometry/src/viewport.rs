@@ -11,7 +11,7 @@ pub struct Viewport {
 }
 
 impl Viewport {
-    pub fn handle_pan(&mut self, ui: &mut egui::Ui, response: Response) {
+    pub fn handle_pan(&mut self, ui: &mut egui::Ui, response: Response) -> bool {
         if self.config.is_pannable && response.dragged() {
             ui.ctx().set_cursor_icon(egui::CursorIcon::Grab);
 
@@ -22,17 +22,23 @@ impl Viewport {
             self.geometry.offset.y += Pixel(delta.y as f64 * DRAGGING_COEFFICIENT);
 
             ui.ctx().request_repaint();
+
+            return true;
         }
+
+        false
     }
 
-    pub fn handle_scroll(&mut self, input_state: &InputState) {
+    pub fn handle_scroll(&mut self, input_state: &InputState) -> bool {
         if !self.config.is_zoomable {
-            return;
+            return false;
         }
 
         let delta = input_state.smooth_scroll_delta.y;
 
         self.geometry.pixels_per_centimeter += (delta as f64) * 0.1;
+
+        delta != 0.0
     }
 
     pub fn update_state(&mut self, response: &Response) {

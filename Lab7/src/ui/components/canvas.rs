@@ -12,9 +12,15 @@ impl CanvasComponent {
             Frame::canvas(ui.style())
                 .fill(Color32::WHITE)
                 .show(ui, |ui| {
-                    ui.input(|i| context.viewport.handle_scroll(i));
+                    ui.input(|i| {
+                        if context.viewport.handle_scroll(i) {
+                            context.figures.regenerate_fractal(&context.viewport);
+                        }
+                    });
                     let response = Self::pipeline(ui, context);
-                    context.viewport.handle_pan(ui, response);
+                    if context.viewport.handle_pan(ui, response) {
+                        context.figures.regenerate_fractal(&context.viewport);
+                    };
                 });
         });
     }
@@ -28,14 +34,19 @@ impl CanvasComponent {
         let mut lines = vec![];
 
         let grid: Vec<Line2D<Point2D>> = context.figures.grid.lines(&context.viewport);
+        let fractal = context.figures.points.clone();
 
         // Conversion to shapes
         lines.extend(grid);
 
-        lines
+        let mut shapes = lines
             .iter()
             .map(|line| line.to_pixels(&context.viewport).to_shape())
-            .collect::<Vec<Shape>>()
+            .collect::<Vec<Shape>>();
+
+        shapes.extend(fractal);
+
+        shapes
     }
 
     fn draw(ui: &mut egui::Ui, context: &mut Context, shapes: Vec<Shape>) -> Response {

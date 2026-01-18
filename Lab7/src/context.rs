@@ -1,6 +1,9 @@
 use crate::ui::modals::error::ErrorModal;
 use crate::utils::channel::Channel;
+use egui::Shape;
 use geometry::figures::grid::{Grid2D, Grid2DBuilder};
+use geometry::fractals::FractalIFS;
+use geometry::fractals::zigzag::FractalZigZag;
 use geometry::units::Centimeter;
 use geometry::viewport::{Viewport, ViewportGeometry, ViewportState, ZeroPointLocation};
 
@@ -42,12 +45,26 @@ impl Context {
 #[derive(Debug)]
 pub struct FiguresState {
     pub grid: Grid2D,
+    pub fractal: FractalZigZag,
+    pub points: Vec<Shape>,
 }
 
 impl Default for FiguresState {
     fn default() -> Self {
+        let mut grid = Grid2DBuilder::default().with_unit(Centimeter(1.0)).build();
+        grid.is_enabled = false;
+
         Self {
-            grid: Grid2DBuilder::default().with_unit(Centimeter(1.0)).build(),
+            grid,
+            fractal: FractalZigZag::default(),
+            points: vec![],
         }
+    }
+}
+
+impl FiguresState {
+    pub fn regenerate_fractal(&mut self, viewport: &Viewport) {
+        let fractals = self.fractal.shapes(viewport);
+        self.points = fractals;
     }
 }
