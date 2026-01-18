@@ -32,9 +32,8 @@ impl Surface {
         let u_steps = self.mesh as usize;
         let v_steps = (self.mesh / 2.0) as usize;
 
-        let apex = Point3D::new(0.0, 0.0, self.height.value());
+        let apex = Point3D::new(0.0, self.height.value(), 0.0);
 
-        // 1. Горизонтальні кільця
         for j in 0..=v_steps {
             let v = j as f64 / v_steps as f64;
             let z = self.height * v;
@@ -48,8 +47,8 @@ impl Surface {
                 let theta2 = (std::f64::consts::PI * 2.0 * ((i + 1) % u_steps) as f64)
                     / u_steps as f64;
 
-                let p1 = Point3D::new(rx * theta1.cos(), ry * theta1.sin(), z.value());
-                let p2 = Point3D::new(rx * theta2.cos(), ry * theta2.sin(), z.value());
+                let p1 = Point3D::new(rx * theta1.cos(), z.value(), ry * theta1.sin());
+                let p2 = Point3D::new(rx * theta2.cos(), z.value(), ry * theta2.sin());
 
                 lines.push(Line3D::new(p1, p2, self.style.stroke));
             }
@@ -60,8 +59,8 @@ impl Surface {
 
             let base_p = Point3D::new(
                 self.radius_x.value() * theta.cos(),
-                self.radius_y.value() * theta.sin(),
                 0.0,
+                self.radius_y.value() * theta.sin(),
             );
 
             lines.push(Line3D::new(base_p, apex, self.style.stroke));
