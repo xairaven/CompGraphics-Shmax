@@ -186,6 +186,14 @@ impl SettingsComponent {
                     .range(Percent::RANGE),
             );
             ui.end_row();
+
+            ui.label("Rotation (Pivot Center):");
+            ui.add(
+                DragValue::new(&mut context.figures.surface.texture_rotation_angle)
+                    .speed(1.0)
+                    .suffix(" °"),
+            );
+            ui.end_row();
         });
     }
 

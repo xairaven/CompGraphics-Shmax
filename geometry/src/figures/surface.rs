@@ -1,4 +1,5 @@
 use crate::figures::texture::Texture;
+use crate::math::angle::Angle;
 use crate::primitives::line2d::Line2D;
 use crate::primitives::line3d::Line3D;
 use crate::primitives::point2d::Point2D;
@@ -16,6 +17,7 @@ pub struct Surface {
     pub texture_scale_height: Percent,
     pub texture_offset_angle: Percent,
     pub texture_offset_height: Percent,
+    pub texture_rotation_angle: f64,
     pub style: SurfaceStyle,
 }
 
@@ -29,6 +31,7 @@ impl Default for Surface {
             texture_scale_height: Percent(0.5),
             texture_offset_angle: Percent(0.0),
             texture_offset_height: Percent(0.5),
+            texture_rotation_angle: 0.0,
             is_texture_enabled: false,
             style: SurfaceStyle::default(),
         }
@@ -118,12 +121,21 @@ impl Surface {
 
     fn apply_uv_transform(&self, uv: (f64, f64)) -> (f64, f64) {
         let (u_raw, v_raw) = uv;
-        let (scale_u, scale_v) = (self.texture_scale_width, self.texture_scale_height);
-        let (offset_u, offset_v) =
-            (self.texture_offset_angle, self.texture_offset_height);
 
-        let u_final = offset_u.value() + (u_raw - 0.5) * scale_u.value();
-        let v_final = offset_v.value() + (v_raw - 0.5) * scale_v.value();
+        let u_local = u_raw - 0.5;
+        let v_local = v_raw - 0.5;
+
+        let u_scaled = u_local * self.texture_scale_width.value();
+        let v_scaled = v_local * self.texture_scale_height.value();
+
+        let rad = Angle::from_degree(self.texture_rotation_angle).radian();
+        let (sin, cos) = (rad.sin(), rad.cos());
+
+        let u_rotated = u_scaled * cos - v_scaled * sin;
+        let v_rotated = u_scaled * sin + v_scaled * cos;
+
+        let u_final = self.texture_offset_angle.value() + u_rotated;
+        let v_final = self.texture_offset_height.value() + v_rotated;
 
         (u_final, v_final)
     }
