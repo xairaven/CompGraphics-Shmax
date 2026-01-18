@@ -164,6 +164,14 @@ impl Surface {
         }
         (min_x, max_x, min_y, max_y)
     }
+
+    pub fn pivot_point(&self) -> Point3D {
+        Point3D {
+            x: Centimeter(0.0),
+            y: Centimeter(self.height.value() / 2.0),
+            z: Centimeter(0.0),
+        }
+    }
 }
 
 #[derive(Debug)]

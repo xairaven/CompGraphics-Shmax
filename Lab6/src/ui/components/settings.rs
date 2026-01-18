@@ -223,6 +223,7 @@ impl SettingsComponent {
     fn euclidean(&self, ui: &mut egui::Ui, context: &mut Context) {
         ui.vertical_centered_justified(|ui| {
             ui.label(RichText::new("Euclidean Transformations").color(Color32::WHITE));
+            ui.label(RichText::new("(Surface)").color(Color32::GRAY));
         });
 
         ui.add_space(5.0);

@@ -1,7 +1,9 @@
 use crate::context::Context;
 use egui::{CentralPanel, Color32, Frame, Painter, Response, Sense, Shape};
 use geometry::primitives::line2d::Line2D;
+use geometry::primitives::line3d::Line3D;
 use geometry::primitives::point2d::Point2D;
+use geometry::primitives::point3d::Point3D;
 
 #[derive(Debug, Default)]
 pub struct CanvasComponent;
@@ -35,26 +37,35 @@ impl CanvasComponent {
             .map(|line| line.to_2d(&context.projections.twopoint))
             .collect();
 
-        let surface: Vec<Line2D<Point2D>> = context
-            .figures
-            .surface
-            .lines()
-            .iter()
-            .map(|line| line.to_2d(&context.projections.twopoint))
-            .collect();
+        let surface: Vec<Line3D<Point3D>> = context.figures.surface.lines();
+        let mut pivot = context.figures.surface.pivot_point();
 
-        let texture: Vec<Line2D<Point2D>> = context
+        let texture: Vec<Line3D<Point3D>> = context
             .figures
             .surface
-            .handle_texture(&context.figures.texture)
-            .iter()
-            .map(|line| line.to_2d(&context.projections.twopoint))
-            .collect();
+            .handle_texture(&context.figures.texture);
+
+        let mut lines3d = [surface, texture].concat();
+
+        context
+            .transformations
+            .offset
+            .handle(vec![&mut context.pipelines.surface]);
+        context
+            .transformations
+            .rotation
+            .handle(vec![&mut context.pipelines.surface]);
+
+        context.pipelines.surface.do_tasks(&mut lines3d, &mut pivot);
 
         // Conversion to shapes
+        let lines3d: Vec<Line2D<Point2D>> = lines3d
+            .iter()
+            .map(|line| line.to_2d(&context.projections.twopoint))
+            .collect();
+
         lines.extend(grid);
-        lines.extend(surface);
-        lines.extend(texture);
+        lines.extend(lines3d);
 
         lines
             .iter()

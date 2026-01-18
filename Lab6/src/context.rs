@@ -3,6 +3,7 @@ use crate::utils::channel::Channel;
 use geometry::figures::grid3d::Grid3D;
 use geometry::figures::surface::Surface;
 use geometry::figures::texture::Texture;
+use geometry::pipeline::Pipeline3D;
 use geometry::projections::twopoint::TwoPointPerspective;
 use geometry::transformations::euclidean::offset3d::EuclideanOffset3D;
 use geometry::transformations::euclidean::rotation3d::EuclideanRotation3D;
@@ -15,6 +16,7 @@ pub struct Context {
     pub transformations: TransformContext,
     pub animations: AnimationsContext,
     pub viewport: Viewport,
+    pub pipelines: Pipelines,
     pub errors_channel: Channel<ErrorModal>,
 }
 
@@ -25,6 +27,7 @@ impl Default for Context {
             projections: ProjectionsContext::default(),
             transformations: TransformContext::default(),
             animations: AnimationsContext,
+            pipelines: Pipelines::default(),
 
             viewport: Viewport {
                 // Default settings like panning, zooming, etc.
@@ -54,6 +57,11 @@ pub struct FiguresState {
     pub grid: Grid3D,
     pub surface: Surface,
     pub texture: Texture,
+}
+
+#[derive(Debug, Default)]
+pub struct Pipelines {
+    pub surface: Pipeline3D,
 }
 
 #[derive(Debug, Default)]
