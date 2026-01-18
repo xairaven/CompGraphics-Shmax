@@ -112,18 +112,9 @@ impl SettingsComponent {
             );
             ui.end_row();
 
-            ui.label("Radius X:");
+            ui.label("Radius:");
             ui.add(
-                DragValue::new(&mut context.figures.surface.radius_x.0)
-                    .speed(0.1)
-                    .range(1.0..=f64::INFINITY)
-                    .fixed_decimals(2),
-            );
-            ui.end_row();
-
-            ui.label("Radius Y:");
-            ui.add(
-                DragValue::new(&mut context.figures.surface.radius_y.0)
+                DragValue::new(&mut context.figures.surface.radius_base.0)
                     .speed(0.1)
                     .range(1.0..=f64::INFINITY)
                     .fixed_decimals(2),
