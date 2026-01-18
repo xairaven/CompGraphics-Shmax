@@ -86,9 +86,59 @@ impl SettingsComponent {
                     ui.separator();
                     ui.add_space(10.0);
 
+                    self.surface(ui, context);
+
+                    ui.add_space(10.0);
+                    ui.separator();
+                    ui.add_space(10.0);
+
                     self.euclidean(ui, context);
                 });
             });
+    }
+
+    fn surface(&self, ui: &mut egui::Ui, context: &mut Context) {
+        ui.label(RichText::new("Surface Settings").color(Color32::WHITE));
+
+        ui.add_space(5.0);
+
+        Grid::new("Surface Settings").num_columns(2).show(ui, |ui| {
+            ui.label("Height:");
+            ui.add(
+                DragValue::new(&mut context.figures.surface.height.0)
+                    .speed(0.1)
+                    .range(1.0..=f64::INFINITY)
+                    .fixed_decimals(2),
+            );
+            ui.end_row();
+
+            ui.label("Radius X:");
+            ui.add(
+                DragValue::new(&mut context.figures.surface.radius_x.0)
+                    .speed(0.1)
+                    .range(1.0..=f64::INFINITY)
+                    .fixed_decimals(2),
+            );
+            ui.end_row();
+
+            ui.label("Radius Y:");
+            ui.add(
+                DragValue::new(&mut context.figures.surface.radius_y.0)
+                    .speed(0.1)
+                    .range(1.0..=f64::INFINITY)
+                    .fixed_decimals(2),
+            );
+            ui.end_row();
+
+            ui.label("Mesh Density:");
+            ui.add(
+                DragValue::new(&mut context.figures.surface.mesh)
+                    .speed(1)
+                    .range(10.0..=f64::INFINITY)
+                    .fixed_decimals(0),
+            );
+            ui.end_row();
+        });
     }
 
     fn matrix(&self, ui: &mut egui::Ui, context: &mut Context) {
