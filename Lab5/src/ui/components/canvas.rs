@@ -26,7 +26,7 @@ impl CanvasComponent {
         Self::draw(ui, context, shapes)
     }
 
-    fn create_shapes(_ui: &mut egui::Ui, context: &mut Context) -> Vec<Shape> {
+    fn create_shapes(ui: &mut egui::Ui, context: &mut Context) -> Vec<Shape> {
         let mut lines = vec![];
 
         let grid: Vec<Line2D<Point2D>> = context
@@ -48,11 +48,25 @@ impl CanvasComponent {
             .transformations
             .rotation
             .handle(vec![&mut context.figures.star_pipeline]);
+        context.animations.star.run(
+            ui,
+            &mut context.figures.star,
+            &mut context.animations.rotation,
+        );
 
         context
             .figures
             .star_pipeline
             .do_tasks(&mut star, &mut pivot);
+
+        // Animation for rotation
+        if context.animations.star.is_enabled {
+            for line in &mut star {
+                context.animations.rotation.go(&mut line.start, &mut pivot);
+                context.animations.rotation.go(&mut line.end, &mut pivot);
+            }
+            ui.ctx().request_repaint();
+        }
 
         let star: Vec<Line2D<Point2D>> = star
             .iter()

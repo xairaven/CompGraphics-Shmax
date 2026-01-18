@@ -1,5 +1,6 @@
 pub mod contour;
 pub mod epicycloid;
+pub mod star;
 pub mod walker;
 
 #[derive(Debug)]

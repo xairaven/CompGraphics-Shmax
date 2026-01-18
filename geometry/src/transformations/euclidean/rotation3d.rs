@@ -50,6 +50,16 @@ pub struct Rotation3DOperation {
     pub angle_z: Angle,
 }
 
+impl Default for Rotation3DOperation {
+    fn default() -> Self {
+        Self {
+            angle_x: Angle::from_degree(0.0),
+            angle_y: Angle::from_degree(0.0),
+            angle_z: Angle::from_degree(0.0),
+        }
+    }
+}
+
 impl Rotation3DOperation {
     pub fn go(&self, point: &mut Point3D, pivot: &mut Point3D) {
         let matrix_to_origin = self.matrix_offset_to_origin(pivot);

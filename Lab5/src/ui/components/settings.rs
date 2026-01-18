@@ -92,6 +92,12 @@ impl SettingsComponent {
                     ui.separator();
                     ui.add_space(10.0);
 
+                    self.animation(ui, context);
+
+                    ui.add_space(10.0);
+                    ui.separator();
+                    ui.add_space(10.0);
+
                     self.euclidean(ui, context);
                 });
             });
@@ -126,6 +132,37 @@ impl SettingsComponent {
             if ui.button("Reset").clicked() {
                 context.figures.star.reset();
             }
+        });
+    }
+
+    fn animation(&self, ui: &mut egui::Ui, context: &mut Context) {
+        ui.group(|ui| {
+            ui.vertical_centered_justified(|ui| {
+                ui.label(RichText::new("Animation").color(Color32::WHITE));
+            });
+
+            ui.add_space(5.0);
+
+            ui.horizontal(|ui| {
+                ui.label("Status:");
+                if context.animations.star.is_enabled {
+                    ui.colored_label(Color32::LIGHT_GREEN, "Running");
+                } else {
+                    ui.colored_label(Color32::RED, "Stopped");
+                }
+            });
+
+            ui.vertical_centered_justified(|ui| {
+                let text = if context.animations.star.is_enabled {
+                    "Stop"
+                } else {
+                    "Start"
+                };
+
+                if ui.button(text).clicked() {
+                    context.animations.star.toggle();
+                }
+            });
         });
     }
 

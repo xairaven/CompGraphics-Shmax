@@ -1,11 +1,14 @@
 use crate::ui::modals::error::ErrorModal;
 use crate::utils::channel::Channel;
+use geometry::animations::star::AnimationStar;
 use geometry::figures::grid3d::Grid3D;
 use geometry::figures::star3d::Star3D;
 use geometry::pipeline::Pipeline3D;
 use geometry::projections::twopoint::TwoPointPerspective;
 use geometry::transformations::euclidean::offset3d::EuclideanOffset3D;
-use geometry::transformations::euclidean::rotation3d::EuclideanRotation3D;
+use geometry::transformations::euclidean::rotation3d::{
+    EuclideanRotation3D, Rotation3DOperation,
+};
 use geometry::viewport::{Viewport, ViewportGeometry, ViewportState, ZeroPointLocation};
 
 #[derive(Debug)]
@@ -24,7 +27,7 @@ impl Default for Context {
             figures: FiguresState::default(),
             projections: ProjectionsContext::default(),
             transformations: TransformContext::default(),
-            animations: AnimationsContext,
+            animations: AnimationsContext::default(),
 
             viewport: Viewport {
                 // Default settings like panning, zooming, etc.
@@ -63,7 +66,10 @@ pub struct TransformContext {
 }
 
 #[derive(Debug, Default)]
-pub struct AnimationsContext;
+pub struct AnimationsContext {
+    pub star: AnimationStar,
+    pub rotation: Rotation3DOperation,
+}
 
 #[derive(Debug, Default)]
 pub struct ProjectionsContext {
