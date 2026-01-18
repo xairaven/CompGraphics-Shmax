@@ -12,6 +12,7 @@ pub mod figures {
     pub mod grid;
     pub mod grid3d;
     pub mod star3d;
+    pub mod surface;
 }
 pub mod math {
     pub mod angle;

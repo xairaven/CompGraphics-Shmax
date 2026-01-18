@@ -1,6 +1,7 @@
 use crate::ui::modals::error::ErrorModal;
 use crate::utils::channel::Channel;
 use geometry::figures::grid3d::Grid3D;
+use geometry::figures::surface::Surface;
 use geometry::projections::twopoint::TwoPointPerspective;
 use geometry::transformations::euclidean::offset3d::EuclideanOffset3D;
 use geometry::transformations::euclidean::rotation3d::EuclideanRotation3D;
@@ -50,6 +51,7 @@ impl Context {
 #[derive(Debug, Default)]
 pub struct FiguresState {
     pub grid: Grid3D,
+    pub surface: Surface,
 }
 
 #[derive(Debug, Default)]
